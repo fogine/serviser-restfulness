@@ -285,5 +285,54 @@ describe('Resource', function() {
                 }).to.throw(TypeError);
             });
         });
+
+        describe('hasMany', function() {
+            it('should create correct association at the source resource', function() {
+                this.resource1.hasMany(this.resource2);
+                this.resource1._associations.should.have.property('resources2')
+                .that.is.eql({
+                    type: '1xM',
+                    foreignKey: 'resource1_key',
+                    localKey: 'key',
+                });
+            });
+
+            it('should allow us to overwrite foreignKey & localKey defaults', function() {
+                this.resource1.hasMany(this.resource2, {
+                    foreignKey: 'resource_uid', //resource2 column
+                    localKey: 'uid' //resource1 column
+                });
+                this.resource1._associations.should.have.property('resources2')
+                .that.is.eql({
+                    type: '1xM',
+                    foreignKey: 'resource_uid',
+                    localKey: 'uid'
+                });
+            });
+
+            it('should be noop when the association has been already defined', function() {
+                this.resource1.hasMany(this.resource2);
+
+                this.resource1._associations.should.have.property('resources2')
+                .that.is.eql({
+                    type: '1xM',
+                    foreignKey: 'resource1_key',
+                    localKey: 'key'
+                });
+
+                let assocBck = this.resource1._associations['resources2'];
+
+                this.resource1.hasMany(this.resource2);
+                this.resource1._associations['resources2'].should.be.equal(assocBck);
+            });
+
+            it('should throw a TypeError when invalid related resource is provided', function() {
+                const self = this;
+
+                this.expect(function() {
+                    self.resource1.hasMany({});
+                }).to.throw(TypeError);
+            });
+        });
     });
 });
