@@ -93,6 +93,19 @@ describe('Resource', function() {
 
             resource.options.should.have.deep.property('db.table', 'user');
         });
+
+        it('should assign a reference of properties object to responseProperties when no responseProperties are defined', function() {
+            let resource = new Resource({
+                singular: 'user',
+                plural: 'users',
+                properties: {
+                    username: {type: 'string'}
+                }
+            });
+
+            resource.options.should.have.deep.property('responseProperties.username');
+            resource.options.responseProperties.should.be.equal(resource.options.properties);
+        });
     });
 
     describe('getName', function() {
@@ -331,6 +344,75 @@ describe('Resource', function() {
 
                 this.expect(function() {
                     self.resource1.hasMany({});
+                }).to.throw(TypeError);
+            });
+        });
+
+        describe('belongsToMany', function() {
+            it('should create correct association at the source resource', function() {
+                this.resource1.belongsToMany(this.resource2);
+                this.resource1._associations.should.have.property('resources2')
+                .that.is.eql({
+                    type: 'MxM',
+                    foreignKey: 'id',
+                    localKey: 'key',
+                    through: {
+                        resource: 'resources1_resources2',
+                        foreignKey: 'resource2_id',
+                        localKey: 'resource1_key'
+                    }
+                });
+            });
+
+            it('should allow us to overwrite foreignKey & localKey defaults', function() {
+                this.resource1.belongsToMany(this.resource2, {
+                    foreignKey: 'uuid', //resource2 column
+                    localKey: 'id', //resource1 column
+                    through: {
+                        foreignKey: 'resource2_uuid',
+                        localKey: 'resource1_id'
+                    }
+                });
+
+                this.resource1._associations.should.have.property('resources2')
+                .that.is.eql({
+                    type: 'MxM',
+                    foreignKey: 'uuid',
+                    localKey: 'id',
+                    through: {
+                        resource: 'resources1_resources2',
+                        foreignKey: 'resource2_uuid',
+                        localKey: 'resource1_id'
+                    }
+                });
+            });
+
+            it('should be noop when the association has been already defined', function() {
+                this.resource1.belongsToMany(this.resource2);
+
+                this.resource1._associations.should.have.property('resources2')
+                .that.is.eql({
+                    type: 'MxM',
+                    foreignKey: 'id',
+                    localKey: 'key',
+                    through: {
+                        resource: 'resources1_resources2',
+                        foreignKey: 'resource2_id',
+                        localKey: 'resource1_key'
+                    }
+                });
+
+                let assocBck = this.resource1._associations['resources2'];
+
+                this.resource1.belongsToMany(this.resource2);
+                this.resource1._associations['resources2'].should.be.equal(assocBck);
+            });
+
+            it('should throw a TypeError when invalid related resource is provided', function() {
+                const self = this;
+
+                this.expect(function() {
+                    self.resource1.belongsToMany({});
                 }).to.throw(TypeError);
             });
         });
