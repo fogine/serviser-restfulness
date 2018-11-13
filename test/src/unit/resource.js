@@ -1,6 +1,11 @@
-const Resource = require('../../../lib/resource.js');
+const Resource         = require('../../../lib/resource.js');
+const ResourceRegistry = require('../../../lib/resourceRegistry.js');
 
 describe('Resource', function() {
+    it('should have static property named registry of instanceof ResourceRegistry value', function() {
+        Resource.registry.should.be.instanceof(ResourceRegistry);
+    });
+
     describe('constructor', function() {
         it('should fail with an Error when singular resource name is not provided', function() {
             this.expect(function() {
@@ -105,6 +110,18 @@ describe('Resource', function() {
 
             resource.options.should.have.deep.property('responseProperties.username');
             resource.options.responseProperties.should.be.equal(resource.options.properties);
+        });
+
+        it('should register itself with Resource.registry', function() {
+            let resource = new Resource({
+                singular: 'user',
+                plural: 'users',
+                properties: {
+                    username: {type: 'string'}
+                }
+            });
+
+            Resource.registry.getByPluralName('users').should.be.equal(resource);
         });
     });
 
