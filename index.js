@@ -2,6 +2,8 @@ const Service = require('bi-service');
 const Resource = require('./lib/resource.js');
 const utils = require('./lib/utils.js');
 
+const get = require('./lib/routes/get.js');
+
 const App = Service.App; //http app prototype
 
 /**
@@ -16,8 +18,8 @@ App.prototype.buildRestfulRouter = function(options) {
     //this.resourceManager.get('knex');
     options = options || {};
 
-    const queryResources = utils.parseUrlResources(options.url, Resource.registry);
-    const url = utils.normalizeUrl(options.url, queryResources);
+    const querySegments = utils.parseUrlResources(options.url, Resource.registry);
+    const url = utils.normalizeUrl(options.url, querySegments);
 
     const router = this.buildRouter({
         url: url,
@@ -25,8 +27,11 @@ App.prototype.buildRestfulRouter = function(options) {
     });
 
     router.$restfulness = {
-        queryResources: queryResources
+        urlTemplate: options.url,
+        querySegments: querySegments
     };
+
+    router.get = get;
 
     return router;
 };

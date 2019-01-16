@@ -1,15 +1,14 @@
-const Resource         = require('../../../lib/resource.js');
-const ResourceRegistry = require('../../../lib/resourceRegistry.js');
-
 describe('Resource', function() {
     it('should have static property named registry of instanceof ResourceRegistry value', function() {
-        Resource.registry.should.be.instanceof(ResourceRegistry);
+        this.Resource.registry.should.be.instanceof(this.ResourceRegistry);
     });
 
     describe('constructor', function() {
         it('should fail with an Error when singular resource name is not provided', function() {
+            const self = this;
+
             this.expect(function() {
-                new Resource({
+                new self.Resource({
                     plural: 'users',
                     properties: {}
                 });
@@ -17,7 +16,7 @@ describe('Resource', function() {
         });
 
         it('should trim and convert toLowerCase the resource name(s)', function() {
-            let resource = new Resource({
+            let resource = new this.Resource({
                 plural: '  Users  ',
                 singular: '  UseR',
                 properties: {}
@@ -28,8 +27,10 @@ describe('Resource', function() {
         });
 
         it('should fail with an Error when plural resource name is not provided', function() {
+            const self = this;
+
             this.expect(function() {
-                new Resource({
+                new self.Resource({
                     singular: 'user',
                     properties: {}
                 });
@@ -37,8 +38,10 @@ describe('Resource', function() {
         });
 
         it('should fail with an Error when properties object is not provided', function() {
+            const self = this;
+
             this.expect(function() {
-                new Resource({
+                new self.Resource({
                     singular: 'user',
                     plural: 'users'
                 });
@@ -46,8 +49,10 @@ describe('Resource', function() {
         });
 
         it('should fail with an Error when invalid `dynamicDefaults` option value is provided', function() {
+            const self = this;
+
             this.expect(function() {
-                new Resource({
+                new self.Resource({
                     singular: 'user',
                     plural: 'users',
                     properties: {},
@@ -57,8 +62,10 @@ describe('Resource', function() {
         });
 
         it('should fail with an Error when invalid `db` option value is provided', function() {
+            const self = this;
+
             this.expect(function() {
-                new Resource({
+                new self.Resource({
                     singular: 'user',
                     plural: 'users',
                     properties: {},
@@ -68,8 +75,10 @@ describe('Resource', function() {
         });
 
         it('should fail with an Error when invalid `db.table` option value is provided', function() {
+            const self = this;
+
             this.expect(function() {
-                new Resource({
+                new self.Resource({
                     singular: 'user',
                     plural: 'users',
                     properties: {},
@@ -79,8 +88,10 @@ describe('Resource', function() {
         });
 
         it('should fail with an Error when invalid `db.key` option value is provided', function() {
+            const self = this;
+
             this.expect(function() {
-                new Resource({
+                new self.Resource({
                     singular: 'user',
                     plural: 'users',
                     properties: {},
@@ -90,7 +101,7 @@ describe('Resource', function() {
         });
 
         it('should assign default value of db.table option', function() {
-            let resource = new Resource({
+            let resource = new this.Resource({
                 singular: 'user',
                 plural: 'users',
                 properties: {}
@@ -100,7 +111,7 @@ describe('Resource', function() {
         });
 
         it('should assign a reference of properties object to responseProperties when no responseProperties are defined', function() {
-            let resource = new Resource({
+            let resource = new this.Resource({
                 singular: 'user',
                 plural: 'users',
                 properties: {
@@ -113,7 +124,7 @@ describe('Resource', function() {
         });
 
         it('should register itself with Resource.registry', function() {
-            let resource = new Resource({
+            let resource = new this.Resource({
                 singular: 'user',
                 plural: 'users',
                 properties: {
@@ -121,13 +132,13 @@ describe('Resource', function() {
                 }
             });
 
-            Resource.registry.getByPluralName('users').should.be.equal(resource);
+            this.Resource.registry.getByPluralName('users').should.be.equal(resource);
         });
     });
 
     describe('getName', function() {
         before(function() {
-            this.resource = new Resource({
+            this.resource = new this.Resource({
                 singular: 'user',
                 plural: 'users',
                 properties: {}
@@ -151,7 +162,7 @@ describe('Resource', function() {
 
     describe('getPluralName', function() {
         before(function() {
-            this.resource = new Resource({
+            this.resource = new this.Resource({
                 singular: 'user',
                 plural: 'users',
                 properties: {}
@@ -165,7 +176,7 @@ describe('Resource', function() {
 
     describe('getTableName', function() {
         it('should return database table name', function() {
-            let resource = new Resource({
+            let resource = new this.Resource({
                 singular: 'user',
                 plural: 'users',
                 properties: {}
@@ -174,7 +185,7 @@ describe('Resource', function() {
         });
 
         it('should return database table name (2)', function() {
-            let resource = new Resource({
+            let resource = new this.Resource({
                 singular: 'user',
                 plural: 'users',
                 db: {
@@ -189,7 +200,7 @@ describe('Resource', function() {
 
     describe('prop', function() {
         before(function() {
-            this.resource = new Resource({
+            this.resource = new this.Resource({
                 singular: 'user',
                 plural: 'users',
                 properties: {
@@ -232,7 +243,7 @@ describe('Resource', function() {
 
     describe('getKeyName', function() {
         it('should return name of the resource primary key', function() {
-            let resource = new Resource({
+            let resource = new this.Resource({
                 singular: 'user',
                 plural: 'users',
                 db: {
@@ -249,7 +260,7 @@ describe('Resource', function() {
 
     describe('associations', function() {
         beforeEach(function() {
-            this.resource1 = new Resource({
+            this.resource1 = new this.Resource({
                 singular: 'resource1',
                 plural: 'resources1',
                 db: {
@@ -260,7 +271,7 @@ describe('Resource', function() {
                 properties: {}
             });
 
-            this.resource2 = new Resource({
+            this.resource2 = new this.Resource({
                 singular: 'resource2',
                 plural: 'resources2',
                 properties: {}

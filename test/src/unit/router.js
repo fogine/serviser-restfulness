@@ -2,8 +2,6 @@ const path    = require('path');
 const Service = require('bi-service');
 const Config  = require('bi-config');
 const index   = require('../../../index.js');
-//const Resource         = require('../../../lib/resource.js');
-//const ResourceRegistry = require('../../../lib/resourceRegistry.js');
 
 describe('Router', function() {
 
@@ -18,24 +16,43 @@ describe('Router', function() {
         this.app = this.service.buildApp('REST', {
             validator: {definitions: {}}
         });
-    });
 
-    describe('buildRestfulRouter', function() {
-        it('should return a new Router instance', function() {
-            this.app.buildRestfulRouter({
-                url: '/'
-            }).should.be.instanceof(this.app.Router);
+        this.users = new this.Resource({
+            singular: 'user',
+            plural: 'users',
+            properties: {
+                username: {type: 'string'}
+            }
         });
 
-        //it('should bind route generation methods to the router instance', function() {
-            //const router = this.app.buildRestfulRouter({
-                //url: '/'
-            //});
+        this.posts = new this.Resource({
+            singular: 'post',
+            plural: 'posts',
+            properties: {
+                title: {type: 'string'}
+            }
+        });
 
-            //router.should.have.property('get').that.is.a('function');
-            //router.should.have.property('post').that.is.a('function');
-            //router.should.have.property('put').that.is.a('function');
-            //router.should.have.property('del').that.is.a('function');
-        //});
+        this.router = this.app.buildRestfulRouter({
+            url: '/api/{version}/@users',
+            version: 1.0
+        });
+    });
+
+    after(function() {
+        this.Resource.registry = new this.ResourceRegistry;
+    });
+
+    describe('get', function() {
+        it('should return a new Route object', function() {
+            this.router.get().should.be.instanceof(Service.Route);
+        });
+
+        it('should return a new Route object with correct relative url', function() {
+            const route = this.router.get('/:{key}', {
+                name: 'user'
+            });
+            route.getUrl().should.be.equal('/api/v1.0/users/:user_id');
+        });
     });
 });

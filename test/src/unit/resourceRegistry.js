@@ -1,9 +1,6 @@
-const Resource        = require('../../../lib/resource.js');
-const ResourceRegistry = require('../../../lib/resourceRegistry.js');
-
 describe('ResourceRegistry', function() {
     beforeEach(function() {
-        this.resourceRegistry = new ResourceRegistry;
+        this.resourceRegistry = new this.ResourceRegistry;
     });
 
     describe('add', function() {
@@ -16,7 +13,7 @@ describe('ResourceRegistry', function() {
         });
 
         it('should register provided resource object', function() {
-            const res = new Resource({
+            const res = new this.Resource({
                 singular: 'user',
                 plural: 'users',
                 properties: {}
@@ -36,7 +33,7 @@ describe('ResourceRegistry', function() {
 
     describe('getByPluralName', function() {
         beforeEach(function() {
-            const res = new Resource({
+            const res = new this.Resource({
                 singular: 'human',
                 plural: 'humans',
                 properties: {}
@@ -61,7 +58,7 @@ describe('ResourceRegistry', function() {
 
     describe('getBySingularName', function() {
         beforeEach(function() {
-            const res = new Resource({
+            const res = new this.Resource({
                 singular: 'human',
                 plural: 'humans',
                 properties: {}

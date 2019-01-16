@@ -1,11 +1,8 @@
-const Resource         = require('../../../lib/resource.js');
-const ResourceRegistry = require('../../../lib/resourceRegistry.js');
-const utils            = require('../../../lib/utils.js');
-
+const utils = require('../../../lib/utils.js');
 
 describe('utils', function() {
     before(function() {
-        this.users = new Resource({
+        this.users = new this.Resource({
             singular: 'user',
             plural: 'users',
             properties: {
@@ -13,7 +10,7 @@ describe('utils', function() {
             }
         });
 
-        this.posts = new Resource({
+        this.posts = new this.Resource({
             singular: 'post',
             plural: 'posts',
             properties: {
@@ -21,7 +18,7 @@ describe('utils', function() {
             }
         });
 
-        this.tags = new Resource({
+        this.tags = new this.Resource({
             singular: 'tag',
             plural: 'tags',
             properties: {
@@ -33,11 +30,11 @@ describe('utils', function() {
 
     describe('parseUrlResources', function() {
         before(function() {
-            this.registry = Resource.registry;
+            this.registry = this.Resource.registry;
         });
 
         after(function() {
-            Resource.registry = new ResourceRegistry;
+            this.Resource.registry = new this.ResourceRegistry;
         });
 
         it('should throw an Error when we provide zero length string', function() {
@@ -102,11 +99,19 @@ describe('utils', function() {
             });
         });
 
-        describe('follow up partial url', function() {
+        describe('relative url', function() {
             before(function() {
+                let segmentCollection = new this.QuerySegmentCollection;
+                segmentCollection.add(this.users);
+
+                //this case assumes the url is extension of eg: router url
+                //and thus first segment with username query constraint
+                //is dependent and will be merged with segment in provided
+                //segmentCollection
                 this.output = utils.parseUrlResources(
                     '/:username/@posts',
-                    this.registry
+                    this.registry,
+                    segmentCollection
                 );
             });
 
@@ -117,10 +122,8 @@ describe('utils', function() {
             });
 
             it('should define username column as query constraint', function() {
-                //this case assumes the url is extension of eg: router url
-                //and thus first segment with username query constraint will have to
-                //be merged with the last resource of the router url
                 this.output[0].should.be.eql({
+                    resource: this.users,
                     narrowedDownBy: 'username'
                 });
             });
@@ -128,6 +131,33 @@ describe('utils', function() {
             it('should define posts resource as last segment', function() {
                 this.output[1].should.be.eql({
                     resource: this.posts
+                });
+            });
+        });
+
+        describe('relative url (2)', function() {
+            before(function() {
+                let segmentCollection = new this.QuerySegmentCollection;
+                segmentCollection.add(this.users);
+
+                //this case assumes the url is extension of eg: router url
+                //and thus first segment which defines primary key parameter
+                //query constraint is dependent and will be merged with
+                //segment in provided segmentCollection
+                this.output = utils.parseUrlResources(
+                    '/:{key}',
+                    this.registry,
+                    segmentCollection
+                );
+            });
+
+            it('should return parsed segment collection', function() {
+
+                this.output.should.be.instanceof(Array);
+                this.expect(this.output.length).to.be.equal(1);
+                this.output[0].should.be.eql({
+                    resource: this.users,
+                    narrowedDownBy: 'id'
                 });
             });
         });
