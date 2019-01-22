@@ -74,9 +74,9 @@ describe('App', function() {
             });
 
             router.should.have.property('get').that.is.a('function');
-            //router.should.have.property('post').that.is.a('function');
-            //router.should.have.property('put').that.is.a('function');
-            //router.should.have.property('del').that.is.a('function');
+            router.should.have.property('post').that.is.a('function');
+            router.should.have.property('put').that.is.a('function');
+            router.should.have.property('del').that.is.a('function');
         });
     });
 });

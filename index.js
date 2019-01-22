@@ -3,6 +3,9 @@ const Resource = require('./lib/resource.js');
 const utils = require('./lib/utils.js');
 
 const get = require('./lib/routes/get.js');
+const post = require('./lib/routes/post.js');
+const put = require('./lib/routes/put.js');
+const del = require('./lib/routes/del.js');
 
 const App = Service.App; //http app prototype
 
@@ -32,6 +35,9 @@ App.prototype.buildRestfulRouter = function(options) {
     };
 
     router.get = get;
+    router.post = post;
+    router.put = put;
+    router.del = del;
 
     return router;
 };

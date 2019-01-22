@@ -45,7 +45,8 @@ describe('Router', function() {
 
     describe('get', function() {
         it('should return a new Route object', function() {
-            this.router.get().should.be.instanceof(Service.Route);
+            this.router.get().should.be.instanceof(Service.Route)
+                .that.has.deep.property('options.type', 'get');
         });
 
         it('should return a new Route object with correct relative url', function() {
@@ -53,6 +54,11 @@ describe('Router', function() {
                 name: 'user'
             });
             route.getUrl().should.be.equal('/api/v1.0/users/:user_id');
+        });
+
+        it('should return a new Route object with correct relative url (2)', function() {
+            const route = this.router.get('/@posts');
+            route.getUrl().should.be.equal('/api/v1.0/users/posts');
         });
     });
 });
