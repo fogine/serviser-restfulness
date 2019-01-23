@@ -21,6 +21,7 @@ describe('Router', function() {
             singular: 'user',
             plural: 'users',
             properties: {
+                id: {type: 'integer'},
                 username: {type: 'string'}
             }
         });
@@ -29,6 +30,7 @@ describe('Router', function() {
             singular: 'post',
             plural: 'posts',
             properties: {
+                id: {type: 'integer'},
                 title: {type: 'string'}
             }
         });
@@ -59,6 +61,25 @@ describe('Router', function() {
         it('should return a new Route object with correct relative url (2)', function() {
             const route = this.router.get('/@posts');
             route.getUrl().should.be.equal('/api/v1.0/users/posts');
+        });
+
+        it('should register fallback route query validator middleware in the next tick if none was defined by user', function(cb) {
+            const self = this;
+            const route = this.router.get('/', {name: 'other'});
+
+            this.expect(route.steps.find((v) => {return v.name === 'validator'})).to.be.equal(undefined);
+
+            process.nextTick(function() {
+                try {
+                    const val = route.steps.find((v) => {return v.name === 'validator'});
+                    self.expect(val).to.be.a('object');
+                    val.args.should.be.instanceof(Array);
+                    val.args[1].should.be.equal('query');
+                    return cb();
+                } catch(e) {
+                    return cb(e);
+                }
+            });
         });
     });
 });

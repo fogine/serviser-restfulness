@@ -258,6 +258,73 @@ describe('Resource', function() {
         });
     });
 
+    describe('getResponseProperties', function() {
+        it('should return response properties object when defined', function() {
+            let resource = new this.Resource({
+                singular: 'user',
+                plural: 'users',
+                db: {
+                    key: {
+                        name: 'key'
+                    }
+                },
+                properties: {
+                    password: {type: 'string'}
+                },
+                responseProperties: {
+                    username: {type: 'string'}
+                }
+            });
+
+            resource.getResponseProperties().should.be.eql({
+                username: {type: 'string'}
+            });
+        });
+
+        it('should return generic resource properties definition when response properties arenot defined', function() {
+            let resource = new this.Resource({
+                singular: 'user',
+                plural: 'users',
+                db: {
+                    key: {
+                        name: 'key'
+                    }
+                },
+                properties: {
+                    password: {type: 'string'}
+                },
+            });
+
+            resource.getResponseProperties().should.be.eql({
+                password: {type: 'string'}
+            });
+
+            resource.getResponseProperties().should.be.equal(resource.options.properties);
+        });
+    });
+
+    describe('getProperties', function() {
+        it('should return resource properties object', function() {
+            let resource = new this.Resource({
+                singular: 'user',
+                plural: 'users',
+                db: {
+                    key: {
+                        name: 'key'
+                    }
+                },
+                properties: {
+                    password: {type: 'string'}
+                }
+            });
+
+            resource.getProperties().should.be.eql({
+                password: {type: 'string'}
+            });
+            resource.getProperties().should.be.equal(resource.options.properties);
+        });
+    });
+
     describe('associations', function() {
         beforeEach(function() {
             this.resource1 = new this.Resource({

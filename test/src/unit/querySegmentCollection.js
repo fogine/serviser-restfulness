@@ -7,6 +7,14 @@ describe('QuerySegmentCollection', function() {
                 username: {type: 'string'}
             }
         });
+
+        this.posts = new this.Resource({
+            singular: 'post',
+            plural: 'posts',
+            properties: {
+                title: {type: 'string'}
+            }
+        });
     });
 
     after(function() {
@@ -42,6 +50,16 @@ describe('QuerySegmentCollection', function() {
                 resource: this.users,
                 narrowedDownBy: 'id'
             });
+        });
+    });
+
+    describe('last', function() {
+        it('should return last segment in collection', function() {
+            const collection = new this.QuerySegmentCollection;
+            collection.add(this.users);
+            collection.add(this.posts);
+
+            this.expect(collection.last()).to.be.equal(this._.last(collection));
         });
     });
 
@@ -115,10 +133,14 @@ describe('QuerySegmentCollection', function() {
                 narrowedDownBy: 'username'
             };
 
+            array.push(segment);
+
             const cloned = array.clone();
 
             cloned.should.not.be.equal(array);
             cloned.should.be.eql(array);
+
+            this.expect(cloned[0]).to.not.be.equal(segment);
         });
     });
 });

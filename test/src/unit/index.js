@@ -3,6 +3,7 @@ const chai      = require('chai');
 const sinonChai = require("sinon-chai");
 const Service   = require('bi-service');
 const path      = require('path');
+const _         = require('lodash');
 
 const QuerySegmentCollection = require('../../../lib/querySegmentCollection.js');
 const Resource               = require('../../../lib/resource.js');
@@ -26,6 +27,7 @@ describe('unit tests', function() {
     before(function() {
         this.expect = expect;
         this.chai = chai;
+        this._ = _;
 
         this.Resource = Resource;
         this.QuerySegmentCollection = QuerySegmentCollection;
