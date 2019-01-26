@@ -17,8 +17,6 @@ describe('Router', function() {
             validator: {definitions: {}}
         });
 
-        const validator = this.app.getValidator();
-
         this.users = new this.Resource({
             singular: 'user',
             plural: 'users',
