@@ -325,6 +325,59 @@ describe('Resource', function() {
         });
     });
 
+    describe('getDynamicDefaults', function() {
+        it('should return dynamic defaults definition', function() {
+            let resource = new this.Resource({
+                singular: 'user',
+                plural: 'users',
+                dynamicDefaults: {
+                    created_at: 'datetime'
+                },
+                properties: {
+                    created_at: {type: 'string'}
+                }
+            });
+
+            resource.getDynamicDefaults().should.be.eql({
+                created_at: 'datetime'
+            });
+            resource.getDynamicDefaults().should.be.equal(resource.options.dynamicDefaults);
+        });
+
+        it('should return empty object whne dynamic defaults are not defined', function() {
+            let resource = new this.Resource({
+                singular: 'user',
+                plural: 'users',
+                properties: {
+                    created_at: {type: 'string'}
+                }
+            });
+
+            resource.getDynamicDefaults().should.be.eql({});
+        });
+    });
+
+    describe('getRequiredProperties', function() {
+        it('should return array of property names which dont have either dynamic or static default value defined', function() {
+            let resource = new this.Resource({
+                singular: 'user',
+                plural: 'users',
+                dynamicDefaults: {
+                    created_at: 'datetime',
+                },
+                properties: {
+                    created_at: {type: 'string'},
+                    activated: {type: 'boolean', default: true},
+                    username: {type: 'string'},
+                    password: {type: 'string'}
+                }
+            });
+
+            resource.getRequiredProperties().should.be.eql(['username', 'password']);
+        });
+    });
+
+
     describe('associations', function() {
         beforeEach(function() {
             this.resource1 = new this.Resource({
