@@ -27,7 +27,7 @@
     "scripts": {
         "coverage": "./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- --ui bdd -R spec -t 5000 'tests/src/**/*.js'",
         "test:docker": "cd ./test/src/integration ; docker-compose run --name bi-service-restfulness-test --rm test ; exit_code=$? ; docker-compose down -v ; exit $exit_code",
-        "test:shell": "cd ./test/src/integration ; docker-compose run --name bi-service-restfulness-test-shell --rm test bash ; docker-compose down -v",
+        "test:shell": "cd ./test/src/integration ; docker-compose run -v $(pwd)/../../../:/app -v /app/node_modules --name bi-service-restfulness-test-shell --rm test bash ; docker-compose down -v",
         "test": "mocha --ui bdd --colors --check-leaks -t 5000 --reporter spec 'test/src/unit/index.js'",
         "test:integration": "mocha --ui bdd --colors --check-leaks -t 5000 --reporter spec 'test/src/integration/index.js'"
     },
@@ -41,6 +41,9 @@
         "bi-service": "^1.0.0"
     },
     "devDependencies": {
+        "bi-service-knex": "^1.0.0",
+        "pg": "^7.8.0",
+        "mysql": "^2.16.0",
         "bi-service": "^1.6.2",
         "chai": "^3.5.0",
         "chai-as-promised": "^5.3.0",

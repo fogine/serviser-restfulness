@@ -1,7 +1,7 @@
-const chai      = require('chai');
-const Service   = require('bi-service');
-const path      = require('path');
-const _         = require('lodash');
+const chai    = require('chai');
+const Service = require('bi-service');
+const path    = require('path');
+const _       = require('lodash');
 
 //import the restfulness plugin
 require('../../../index.js');
@@ -20,8 +20,13 @@ describe('integration tests', function() {
     });
 
     before(function() {
+        //
         this.expect = expect;
         this.chai = chai;
         this._ = _;
+    });
+
+    it('should ', function() {
+        
     });
 });
