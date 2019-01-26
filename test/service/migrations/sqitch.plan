@@ -1,0 +1,7 @@
+%syntax-version=1.0.0
+%project=restfulness
+
+users 2019-01-26T19:53:24Z fogine <fogine@archlaptop> # create users table
+movies 2019-01-26T20:46:31Z fogine <fogine@archlaptop> # create movies table
+movies_users 2019-01-26T20:53:07Z fogine <fogine@archlaptop> # create movies_users table
+reviews 2019-01-26T20:58:41Z fogine <fogine@archlaptop> # create reviews table
