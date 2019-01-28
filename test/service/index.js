@@ -2,18 +2,32 @@ const Service = require('bi-service');
 const Config  = require('bi-config');
 const Knex    = require('bi-service-knex');
 const Resource = require('../../lib/resource.js');
+require('../../index.js');
 
 module.exports = createService;
 
-
+return createService('pg').listen().then(function(service) {
+    const swagger = require('bi-service-doc/lib/swagger.js');
+    var specs = swagger.generate(service.appManager.get('test'));
+    //console.log(JSON.stringify(specs));
+});
 /**
  * @param {String} dbProvider
  * @return {Service}
  */
 function createService(dbProvider) {
-    const config = new Config.Config({
+    const config = Config.createMemoryProvider({
         apps: {
-            test: {}
+            test: {
+                baseUrl: 'http://127.0.0.1',
+                doc: {
+                    name: 'Doc',
+                    baseUrl: 'http://127.0.0.1:3000',
+                    listen: 3000,
+                    title: 'User API', //optional
+                    stopOnError: true //optional
+                }
+            }
         }
     });
 
@@ -21,11 +35,25 @@ function createService(dbProvider) {
 
     createResources();
 
-    service.resourceManager.register(
-        'knex',
-        Knex(getDbConnectionOptions(dbProvider))
-    );
+    //TODO fix bug in bi-service-knex inspectIntegrity method
+    //service.resourceManager.register(
+        //'knex',
+        //Knex(getDbConnectionOptions(dbProvider))
+    //);
+    service.knex = Knex(getDbConnectionOptions(dbProvider));
 
+    service.on('set-up', createEndpoints);
+
+    require('bi-service-doc');
+    return service;
+}
+
+/**
+ * @private
+ * @this {Service}
+ */
+function createEndpoints() {
+    const service = this;
     const app = service.buildApp('test');
 
     const users = app.buildRestfulRouter({
@@ -61,8 +89,6 @@ function createService(dbProvider) {
     movies.post('/');//create new movie
     movies.put('/:{key}');//update a movie
     movies.del('/:{key}');//delete a movie
-
-    return service;
 }
 
 
@@ -98,7 +124,7 @@ function getDbConnectionOptions(dbProvider) {
  *
  */
 function createResources() {
-    const user = new self.Resource({
+    const user = new Resource({
         singular: 'user',
         plural: 'users',
         dynamicDefaults: {
@@ -111,6 +137,7 @@ function createResources() {
             email: {type: 'string', format: 'email'}
         },
         responseProperties: {
+            id: {type: 'integer'},
             username: {type: 'string'},
             subscribed: {type: 'boolean'},
             created_at: {type: 'string'},
@@ -118,7 +145,7 @@ function createResources() {
         }
     });
 
-    const review = new self.Resource({
+    const review = new Resource({
         singular: 'review',
         plural: 'reviews',
         properties: {
@@ -126,10 +153,17 @@ function createResources() {
             comment: {type: 'string', maxLength: 128},
             movie_id: {type: 'integer'},
             user_id: {type: 'integer'}
+        },
+        responseProperties: {
+            id: {type: 'integer'},
+            stars: {type: 'integer'},
+            comment: {type: 'string'},
+            movie_id: {type: 'integer'},
+            user_id: {type: 'integer'}
         }
     });
 
-    const movie = new self.Resource({
+    const movie = new Resource({
         singular: 'movie',
         plural: 'movies',
         properties: {
@@ -138,6 +172,7 @@ function createResources() {
             released_at: {type: 'string', format: 'date'}
         },
         responseProperties: {
+            id: {type: 'integer'},
             name: {type: 'string'},
             released_at: {type: 'string'},
             rating: {type: 'number'},//cauculated
@@ -150,3 +185,18 @@ function createResources() {
     review.belongsTo(user);
     review.belongsTo(movie);
 }
+
+/*
+ * TODO remove this when the bug will be fixed in the upstream bi-service package
+ */
+Service.ResourceManager.prototype.register = function(key, resource) {
+
+    if (typeof resource.inspectIntegrity !== 'function'
+    ) {
+        throw new TypeError('The resource must be an object that implements `inspectIntegrity` method');
+    }
+
+    this.resources[key] = resource;
+    this.tag(key, key, '*');
+    return resource;
+};

@@ -25,7 +25,8 @@ services:
       >
        /wait-for-it.sh postgres:5432 --
        /wait-for-it.sh mysql:3306 -- bash -c
-       ' npm run test:integration'
+       ' sqitch deploy db:pg://$$POSTGRES_USER@postgres/$$POSTGRES_DB
+       && npm run test:integration'
   postgres:
     image: "postgres:11-alpine"
     ports:
