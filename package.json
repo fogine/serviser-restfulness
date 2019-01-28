@@ -29,7 +29,7 @@
         "test:docker": "cd ./test/src/integration ; docker-compose run --name bi-service-restfulness-test --rm test ; exit_code=$? ; docker-compose down -v ; exit $exit_code",
         "test:shell": "cd ./test/src/integration ; docker-compose run -v $(pwd)/../../../:/app -v /app/node_modules --name bi-service-restfulness-test-shell --rm test bash ; docker-compose down -v",
         "test": "mocha --ui bdd --colors --check-leaks -t 5000 --reporter spec 'test/src/unit/index.js'",
-        "test:integration": "mocha --ui bdd --colors --check-leaks -t 5000 --reporter spec 'test/src/integration/index.js'"
+        "test:integration": "mocha --ui bdd --colors --globals __core-js_shared__ --check-leaks -t 5000 --reporter spec 'test/src/integration/index.js'"
     },
     "dependencies": {
         "ajv": "~6.5.1",
@@ -42,6 +42,7 @@
     },
     "devDependencies": {
         "bi-service-knex": "^1.0.0",
+        "bi-service-doc": "^2.0.0",
         "pg": "^7.8.0",
         "mysql": "^2.16.0",
         "bi-service": "^1.6.2",
