@@ -42,7 +42,7 @@
     },
     "devDependencies": {
         "bi-service-knex": "^1.0.0",
-        "bi-service-doc": "^2.0.0",
+        "bi-service-sdk": "^1.4.0",
         "pg": "^7.8.0",
         "mysql": "^2.16.0",
         "bi-service": "^1.6.2",
