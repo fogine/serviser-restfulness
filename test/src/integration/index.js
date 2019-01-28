@@ -10,6 +10,17 @@ const expect = chai.expect;
 chai.should();
 
 describe('integration tests', function() {
+    before(function() {
+        //
+        this.expect = expect;
+        this.chai = chai;
+        this._ = _;
+        this.service = require('../../service/index.js')('pg');
+        this.knex = this.service.knex;
+
+        return this.service.listen();
+    });
+
     //load all files in the current directory except itself
     Service.moduleLoader.loadModules([
         path.resolve(`${__dirname}/`),
@@ -19,14 +30,4 @@ describe('integration tests', function() {
         ]
     });
 
-    before(function() {
-        //
-        this.expect = expect;
-        this.chai = chai;
-        this._ = _;
-    });
-
-    it('should ', function() {
-        
-    });
 });
