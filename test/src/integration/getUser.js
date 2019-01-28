@@ -6,6 +6,8 @@ describe('GET /api/v1.0/users/:id', function() {
             password: 'secret',
             subscribed: false,
             email: 'email@email.com'
+        }).returning('id').bind(this).then(function(result) {
+            this.userId = result[0];
         });
     });
 

@@ -6,7 +6,7 @@ x-env: &x-env
   POSTGRES_HOST     : ${POSTGRES_HOST:-postgres}
   MYSQL_HOST        : ${POSTGRES_HOST:-mysql}
   MYSQL_USER        : ${MYSQL_USER:-mysql}
-  MYSQL_PASSWORD    : ${MYSQL_PASSWORD}
+  MYSQL_PASSWORD    : ${MYSQL_PASSWORD:-test}
   MYSQL_DATABASE    : ${MYSQL_DATABASE:-default}
   #MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
   MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
@@ -26,6 +26,7 @@ services:
        /wait-for-it.sh postgres:5432 --
        /wait-for-it.sh mysql:3306 -- bash -c
        ' sqitch deploy db:pg://$$POSTGRES_USER@postgres/$$POSTGRES_DB
+       && sqitch deploy db:mysql://$$MYSQL_USER:$$MYSQL_PASSWORD@mysql/$$MYSQL_DATABASE
        && npm run test:integration'
   postgres:
     image: "postgres:11-alpine"

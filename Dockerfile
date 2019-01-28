@@ -14,7 +14,7 @@ ARG NODE_ENV=development
 # are removed after npm install
 RUN apk --no-cache add --virtual native-deps \
   g++ gcc libgcc libstdc++ linux-headers make python findutils postgresql-dev && \
-  apk add --no-cache perl-dbd-pg postgresql-client && \
+  apk add --no-cache perl-dbd-pg perl-dbd-mysql postgresql-client mysql-client && \
   NODE_ENV=$NODE_ENV && \
   yarn install --quiet --no-optional && \
   yarn cache clean --force && \
