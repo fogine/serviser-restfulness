@@ -21,6 +21,7 @@ describe('App', function() {
             singular: 'user',
             plural: 'users',
             properties: {
+                id: {type: 'integer'},
                 username: {type: 'string'}
             }
         });
@@ -29,6 +30,7 @@ describe('App', function() {
             singular: 'post',
             plural: 'posts',
             properties: {
+                id: {type: 'integer'},
                 title: {type: 'string'}
             }
         });
@@ -64,7 +66,7 @@ describe('App', function() {
 
             router.should.be.instanceof(this.app.Router);
             this.expect(router.options.url).to.be.equal(
-                '/api/v1.0/users/:user_id/posts/:title'
+                '/api/v1.0/users/:id/posts/:title'
             );
         });
 

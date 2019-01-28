@@ -7,6 +7,7 @@ const _         = require('lodash');
 
 const QuerySegmentCollection = require('../../../lib/querySegmentCollection.js');
 const Resource               = require('../../../lib/resource.js');
+const QuerySegment           = require('../../../lib/querySegment.js');
 const ResourceRegistry       = require('../../../lib/resourceRegistry.js');
 
 const expect = chai.expect;
@@ -30,6 +31,7 @@ describe('unit tests', function() {
         this._ = _;
 
         this.Resource = Resource;
+        this.QuerySegment = QuerySegment;
         this.QuerySegmentCollection = QuerySegmentCollection;
         this.ResourceRegistry = ResourceRegistry;
     });

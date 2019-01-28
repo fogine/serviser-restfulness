@@ -55,7 +55,7 @@ describe('Router', function() {
             const route = this.router.get('/:{key}', {
                 name: 'user'
             });
-            route.getUrl().should.be.equal('/api/v1.0/users/:user_id');
+            route.getUrl().should.be.equal('/api/v1.0/users/:id');
         });
 
         it('should return a new Route object with correct relative url (2)', function() {

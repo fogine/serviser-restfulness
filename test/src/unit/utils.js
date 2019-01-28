@@ -6,6 +6,7 @@ describe('utils', function() {
             singular: 'user',
             plural: 'users',
             properties: {
+                id: {type: 'integer'},
                 username: {type: 'string'}
             }
         });
@@ -14,6 +15,7 @@ describe('utils', function() {
             singular: 'post',
             plural: 'posts',
             properties: {
+                id: {type: 'integer'},
                 title: {type: 'string'}
             }
         });
@@ -77,32 +79,28 @@ describe('utils', function() {
             });
 
             it('should define primary key column of the users resource as query constraint', function() {
-                this.output[0].should.be.eql({
-                    resource: this.users,
-                    narrowedDownBy: 'id'
-                });
+                this.output[0].should.be.instanceof(this.QuerySegment);
+                this.output[0].should.have.property('resource', this.users);
+                this.output[0].getPropertyName().should.be.equal('id');
             });
 
             it('should define title column of the posts resource as query constraint', function() {
-                this.output[1].should.be.eql({
-                    resource: this.posts,
-                    narrowedDownBy: 'title'
-                });
+                this.output[1].should.be.instanceof(this.QuerySegment);
+                this.output[1].should.have.property('resource', this.posts);
+                this.output[1].getPropertyName().should.be.equal('title');
             });
 
             it('should not define any query constraint', function() {
-                this.output[2].should.be.eql({
-                    resource: this.tags
-                });
-
-                this.output[2].should.not.have.property('narrowedDownBy');
+                this.output[2].should.be.instanceof(this.QuerySegment);
+                this.output[2].should.have.property('resource', this.tags);
+                this.output[2].isReduced().should.be.equal(false);
             });
         });
 
         describe('relative url', function() {
             before(function() {
                 let segmentCollection = new this.QuerySegmentCollection;
-                segmentCollection.add(this.users);
+                segmentCollection.push(new this.QuerySegment(this.users));
 
                 //this case assumes the url is extension of eg: router url
                 //and thus first segment with username query constraint
@@ -122,23 +120,22 @@ describe('utils', function() {
             });
 
             it('should define username column as query constraint', function() {
-                this.output[0].should.be.eql({
-                    resource: this.users,
-                    narrowedDownBy: 'username'
-                });
+                this.output[0].should.be.instanceof(this.QuerySegment);
+                this.output[0].should.have.property('resource', this.users);
+                this.output[0].getPropertyName().should.be.equal('username');
             });
 
             it('should define posts resource as last segment', function() {
-                this.output[1].should.be.eql({
-                    resource: this.posts
-                });
+                this.output[1].should.be.instanceof(this.QuerySegment);
+                this.output[1].should.have.property('resource', this.posts);
+                this.output[1].isReduced().should.be.equal(false);
             });
         });
 
         describe('relative url (2)', function() {
             before(function() {
                 let segmentCollection = new this.QuerySegmentCollection;
-                segmentCollection.add(this.users);
+                segmentCollection.push(new this.QuerySegment(this.users));
 
                 //this case assumes the url is extension of eg: router url
                 //and thus first segment which defines primary key parameter
@@ -155,36 +152,53 @@ describe('utils', function() {
 
                 this.output.should.be.instanceof(Array);
                 this.expect(this.output.length).to.be.equal(1);
-                this.output[0].should.be.eql({
-                    resource: this.users,
-                    narrowedDownBy: 'id'
-                });
+
+                this.output[0].should.be.instanceof(this.QuerySegment);
+                this.output[0].should.have.property('resource', this.users);
+                this.output[0].getPropertyName().should.be.equal('id');
             });
         });
     });
 
     describe('normalizeUrl', function() {
         it('should replace resource and column name placeholders with valid url segments', function() {
+
             let urlSegments = [
-                {
-                    resource: this.users,
-                    narrowedDownBy: 'id'
-                },
-                {
-                    resource: this.posts,
-                    narrowedDownBy: 'title'
-                },
-                {
-                    resource: this.tags
-                }
+                new this.QuerySegment(this.users),
+                new this.QuerySegment(this.posts),
+                new this.QuerySegment(this.tags)
             ];
+
+            urlSegments[0].reduceBy('id');
+            urlSegments[1].reduceBy('title');
 
             let url =  utils.normalizeUrl(
                 '/api/{version}/@users/:{key}/@posts/:title/@tags',
                 urlSegments
             );
 
-            url.should.be.equal('/api/{version}/users/:user_id/posts/:title/tags');
+            url.should.be.equal('/api/{version}/users/:id/posts/:title/tags');
+        });
+
+        it('should prepend uri parameters with resource name if there are colliding parameter names', function() {
+
+
+            let urlSegments = new this.QuerySegmentCollection();
+            let segment1 = new this.QuerySegment(this.users);
+            let segment2 = new this.QuerySegment(this.posts);
+
+            segment1.reduceBy('id');
+            segment2.reduceBy('id');
+
+            urlSegments.push(segment1, segment2);
+
+
+            let url =  utils.normalizeUrl(
+                '/api/{version}/@users/:{key}/@posts/:{key}',
+                urlSegments
+            );
+
+            url.should.be.equal('/api/{version}/users/:user_id/posts/:post_id');
         });
     });
 });
