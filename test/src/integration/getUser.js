@@ -14,6 +14,6 @@ describe('GET /api/v1.0/users/:id', function() {
     });
 
     it('should return 200 json response with user details', function() {
-
+        //return this.sdk.getUser
     });
 });

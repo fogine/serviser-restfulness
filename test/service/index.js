@@ -2,15 +2,9 @@ const Service = require('bi-service');
 const Config  = require('bi-config');
 const Knex    = require('bi-service-knex');
 const Resource = require('../../lib/resource.js');
-require('../../index.js');
 
 module.exports = createService;
 
-return createService('pg').listen().then(function(service) {
-    const swagger = require('bi-service-doc/lib/swagger.js');
-    var specs = swagger.generate(service.appManager.get('test'));
-    //console.log(JSON.stringify(specs));
-});
 /**
  * @param {String} dbProvider
  * @return {Service}
@@ -18,16 +12,7 @@ return createService('pg').listen().then(function(service) {
 function createService(dbProvider) {
     const config = Config.createMemoryProvider({
         apps: {
-            test: {
-                baseUrl: 'http://127.0.0.1',
-                doc: {
-                    name: 'Doc',
-                    baseUrl: 'http://127.0.0.1:3000',
-                    listen: 3000,
-                    title: 'User API', //optional
-                    stopOnError: true //optional
-                }
-            }
+            test: {}
         }
     });
 
@@ -44,7 +29,6 @@ function createService(dbProvider) {
 
     service.on('set-up', createEndpoints);
 
-    require('bi-service-doc');
     return service;
 }
 

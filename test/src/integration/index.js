@@ -1,7 +1,8 @@
-const chai    = require('chai');
-const Service = require('bi-service');
-const path    = require('path');
-const _       = require('lodash');
+const chai       = require('chai');
+const Service    = require('bi-service');
+const path       = require('path');
+const _          = require('lodash');
+const ServiceSDK = require('../../service/sdk.js');
 
 //import the restfulness plugin
 require('../../../index.js');
@@ -11,6 +12,7 @@ chai.should();
 
 describe('integration tests', function() {
     before(function() {
+        const self = this;
         //
         this.expect = expect;
         this.chai = chai;
@@ -18,7 +20,13 @@ describe('integration tests', function() {
         this.service = require('../../service/index.js')('pg');
         this.knex = this.service.knex;
 
-        return this.service.listen();
+        return this.service.listen().then(function() {
+            let port = self.service.appManager.get('test').server.address().port;
+
+            self.sdk = new ServiceSDK({
+                baseURL: `http://127.0.0.1:${port}`
+            });
+        });
     });
 
     //load all files in the current directory except itself
