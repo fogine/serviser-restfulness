@@ -9,8 +9,8 @@ BEGIN;
     );
 
     ALTER TABLE ONLY movies_users ADD CONSTRAINT movies_users_movie_id_fkey
-        FOREIGN KEY (movie_id) REFERENCES movie(id) ON UPDATE CASCADE ON DELETE CASCADE;
+        FOREIGN KEY (movie_id) REFERENCES movies(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
     ALTER TABLE ONLY movies_users ADD CONSTRAINT movies_users_user_id_fkey
-        FOREIGN KEY (user_id) REFERENCES user(id) ON UPDATE CASCADE ON DELETE CASCADE;
+        FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE;
 COMMIT;
