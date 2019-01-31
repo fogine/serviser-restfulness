@@ -12,12 +12,36 @@ chai.should();
 
 describe('integration tests', function() {
     before(function() {
-        const self = this;
         //
         this.expect = expect;
         this.chai = chai;
         this._ = _;
-        this.service = require('../../service/index.js')('pg');
+    });
+
+    describe('postgres database', function() {
+        before(function() {
+            return initService.call(this, 'pg');
+        });
+
+        loadTestFiles();
+    });
+
+    describe('mysql database', function() {
+        before(function() {
+            return initService.call(this, 'mysql');
+        });
+
+        loadTestFiles();
+    });
+
+    /**
+     * @param {String} dbProvider
+     * @return {Promise}
+     */
+    function initService(dbProvider) {
+        const self = this;
+
+        this.service = require('../../service/index.js')(dbProvider);
         this.knex = this.service.knex;
 
         return this.service.listen().then(function() {
@@ -27,15 +51,26 @@ describe('integration tests', function() {
                 baseURL: `http://127.0.0.1:${port}`
             });
         });
-    });
+    }
 
-    //load all files in the current directory except itself
-    Service.moduleLoader.loadModules([
-        path.resolve(`${__dirname}/`),
-    ], {
-        except: [
-            path.resolve(`${__dirname}/index.js`),//itself
-        ]
-    });
+    /**
+     * @return {undefined}
+     */
+    function loadTestFiles() {
+        //load all files in the current directory except itself
+        Service.moduleLoader.fileIterator([
+            path.resolve(`${__dirname}/`),
+        ], {
+            except: [
+                path.resolve(`${__dirname}/index.js`),//itself
+            ]
+        }, function(file, dir) {
+            if (require.extensions[path.extname(file)]) {
+                let p = path.join(dir, file);
+                delete require.cache[require.resolve(p)];
+                return require(p);
+            }
+        });
+    }
 
 });

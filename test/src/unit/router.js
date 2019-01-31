@@ -67,7 +67,9 @@ describe('Router', function() {
             const self = this;
             const route = this.router.get('/', {name: 'other'});
 
-            this.expect(route.steps.find((v) => {return v.name === 'validator'})).to.be.equal(undefined);
+            this.expect(route.steps.find((v) => {
+                return v.name === 'validator' && !v.hasOwnProperty('$restfulness')
+            })).to.be.equal(undefined);
 
             process.nextTick(function() {
                 try {

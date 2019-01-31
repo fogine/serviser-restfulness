@@ -398,6 +398,50 @@ describe('Resource', function() {
             });
         });
 
+        describe('getAssociatedResourceNames', function() {
+            it('should return collection of associated resource names', function() {
+                this.resource1.belongsTo(this.resource2);
+                this.resource1.getAssociatedResourceNames().should.be.eql(['resources2']);
+                this.resource2.getAssociatedResourceNames().should.be.eql(['resources1']);
+            });
+
+            it('should return an empty array', function() {
+                this.resource1.getAssociatedResourceNames().should.be.eql([]);
+            });
+        });
+
+        describe('hasAssociation', function() {
+            it('should return true if a resource is associated to any other resource', function() {
+                this.resource1.belongsTo(this.resource2);
+
+                this.resource1.hasAssociation().should.be.equal(true);
+                this.resource2.hasAssociation().should.be.equal(true);
+            });
+
+            it('should return false if a resource is NOT associated to any other resource', function() {
+                this.resource1.hasAssociation().should.be.equal(false);
+                this.resource2.hasAssociation().should.be.equal(false);
+            });
+
+            it('should return true if a resource is associated to specific resource provided by first argument', function() {
+                this.resource1.belongsTo(this.resource2);
+
+                this.resource1.hasAssociation(this.resource2).should.be.equal(true);
+                this.resource1.hasAssociation(this.resource2.getPluralName()).should.be.equal(true);
+
+                this.resource2.hasAssociation(this.resource1).should.be.equal(true);
+                this.resource2.hasAssociation(this.resource1.getPluralName()).should.be.equal(true);
+            });
+
+            it('should return false if a resource is NOT associated to specific resource provided by first argument', function() {
+                this.resource1.hasAssociation(this.resource2).should.be.equal(false);
+                this.resource1.hasAssociation(this.resource2.getPluralName()).should.be.equal(false);
+
+                this.resource2.hasAssociation(this.resource1).should.be.equal(false);
+                this.resource2.hasAssociation(this.resource1.getPluralName()).should.be.equal(false);
+            });
+        });
+
         describe('belongsTo', function() {
             it('should create correct association at the source resource', function() {
                 this.resource1.belongsTo(this.resource2);
@@ -406,6 +450,16 @@ describe('Resource', function() {
                     type: '1x1',
                     foreignKey: 'id',
                     localKey: 'resource2_id'
+                });
+            });
+
+            it('should create correct association at the target resource', function() {
+                this.resource1.belongsTo(this.resource2);
+                this.resource2._associations.should.have.property('resources1')
+                .that.is.eql({
+                    type: '1x1',
+                    foreignKey: 'resource2_id',
+                    localKey: 'id'
                 });
             });
 
@@ -455,6 +509,16 @@ describe('Resource', function() {
                     type: '1xM',
                     foreignKey: 'resource1_key',
                     localKey: 'key',
+                });
+            });
+
+            it('should create correct association at the target resource', function() {
+                this.resource1.hasMany(this.resource2);
+                this.resource2._associations.should.have.property('resources1')
+                .that.is.eql({
+                    type: '1xM',
+                    foreignKey: 'key',
+                    localKey: 'resource1_key',
                 });
             });
 
@@ -508,6 +572,21 @@ describe('Resource', function() {
                         resource: 'resources1_resources2',
                         foreignKey: 'resource2_id',
                         localKey: 'resource1_key'
+                    }
+                });
+            });
+
+            it('should create correct association at the target resource', function() {
+                this.resource1.belongsToMany(this.resource2);
+                this.resource2._associations.should.have.property('resources1')
+                .that.is.eql({
+                    type: 'MxM',
+                    foreignKey: 'key',
+                    localKey: 'id',
+                    through: {
+                        resource: 'resources1_resources2',
+                        foreignKey: 'resource1_key',
+                        localKey: 'resource2_id'
                     }
                 });
             });
