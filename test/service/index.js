@@ -2,6 +2,10 @@ const Service = require('bi-service');
 const Config  = require('bi-config');
 const Knex    = require('bi-service-knex');
 const Resource = require('../../lib/resource.js');
+const pgTypes  = require('pg').types;
+
+// override parsing date column to Date()
+pgTypes.setTypeParser(1184, val => val);
 
 module.exports = createService;
 
@@ -50,6 +54,11 @@ function createEndpoints() {
         version: 1.0
     });
 
+    const reviews = app.buildRestfulRouter({
+        url: '/api/{version}/@reviews',
+        version: 1.0
+    });
+
     users.get('/'); //get users
     users.get('/:{key}'); //get user
     users.get('/@movies/'); //get user movies
@@ -73,6 +82,8 @@ function createEndpoints() {
     movies.post('/');//create new movie
     movies.put('/:{key}');//update a movie
     movies.del('/:{key}');//delete a movie
+
+    reviews.get('/:{key}'); //get review
 }
 
 
@@ -98,7 +109,8 @@ function getDbConnectionOptions(dbProvider) {
                 host : process.env.MYSQL_HOST,
                 user : process.env.MYSQL_USER,
                 password : process.env.MYSQL_PASSWORD,
-                database : process.env.MYSQL_DATABASE
+                database : process.env.MYSQL_DATABASE,
+                dateStrings: true
             }
         };
     }
@@ -121,7 +133,7 @@ function createResources() {
             email: {type: 'string', format: 'email'}
         },
         responseProperties: {
-            id: {type: 'integer'},
+            id: {type: 'integer', maximum: 10000000},
             username: {type: 'string'},
             subscribed: {type: 'boolean'},
             created_at: {type: 'string'},

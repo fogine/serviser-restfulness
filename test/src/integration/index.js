@@ -1,20 +1,31 @@
-const chai       = require('chai');
-const Service    = require('bi-service');
-const path       = require('path');
-const _          = require('lodash');
-const ServiceSDK = require('../../service/sdk.js');
+const Promise        = require('bluebird');
+const chai           = require('chai');
+const Service        = require('bi-service');
+const path           = require('path');
+const _              = require('lodash');
+const ServiceSDK     = require('../../service/sdk.js');
+const chaiAsPromised = require('chai-as-promised');
 
 //import the restfulness plugin
 require('../../../index.js');
 
 const expect = chai.expect;
+chai.use(chaiAsPromised);
 chai.should();
+
+//
+//Object.defineProperty(global, 'Promise', {
+    //configurable: false,
+    //writable: false,
+    //value: Promise
+//});
 
 describe('integration tests', function() {
     before(function() {
         //
         this.expect = expect;
         this.chai = chai;
+        this.Promise = Promise;
         this._ = _;
     });
 

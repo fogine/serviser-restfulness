@@ -440,6 +440,70 @@ describe('Resource', function() {
                 this.resource2.hasAssociation(this.resource1).should.be.equal(false);
                 this.resource2.hasAssociation(this.resource1.getPluralName()).should.be.equal(false);
             });
+
+            it('should return true if a resource is associated to a particual resource via 1x1 association type', function() {
+                this.resource1.belongsTo(this.resource2);
+
+                this.resource1.hasAssociation(this.resource2, '1x1').should.be.equal(true);
+                this.resource2.hasAssociation(this.resource1, '1xM').should.be.equal(true);
+            });
+
+            it('should return false if a resource is associated to a particual resource but with INCORRECT association type', function() {
+                this.resource1.belongsTo(this.resource2);
+
+                this.resource1.hasAssociation(this.resource2, '1xM').should.be.equal(false);
+                this.resource2.hasAssociation(this.resource1, '1x1').should.be.equal(false);
+            });
+        });
+
+        describe('hasAssociationType', function() {
+            it('should return true if a resource has 1x1 association to other resource', function() {
+                this.resource1.belongsTo(this.resource2);
+
+                this.resource1.hasAnyAssociationOfType('1x1').should.be.equal(true);
+                this.resource2.hasAnyAssociationOfType('1xM').should.be.equal(true);
+            });
+
+            it('should return false if a resource does NOT have 1x1 association', function() {
+                this.resource1.belongsToMany(this.resource2);
+
+                this.resource1.hasAnyAssociationOfType('1x1').should.be.equal(false);
+                this.resource2.hasAnyAssociationOfType('1x1').should.be.equal(false);
+            });
+        });
+
+        describe('getAssociation', function() {
+            it('should return association details object', function() {
+                this.resource1.belongsTo(this.resource2);
+
+                this.resource1.getAssociation(this.resource2)
+                    .should.be.eql({
+                        type: '1x1',
+                        foreignKey: 'id',
+                        localKey: 'resource2_id'
+                    });
+
+                this.resource1.getAssociation(this.resource2.getPluralName())
+                    .should.be.eql({
+                        type: '1x1',
+                        foreignKey: 'id',
+                        localKey: 'resource2_id'
+                    });
+
+                this.resource1.getAssociation(this.resource2)
+                    .should.be.equal(this.resource1._associations[this.resource2.getPluralName()]);
+            });
+
+            it('should throw an Error when no such association exists', function() {
+                const self = this;
+                this.resource1.belongsToMany(this.resource2);
+
+                function getAssoc() {
+                    self.resource1.getAssociation(self.resource1);
+                }
+
+                this.expect(getAssoc).to.throw(Error, /No such association:/);
+            });
         });
 
         describe('belongsTo', function() {
@@ -457,7 +521,7 @@ describe('Resource', function() {
                 this.resource1.belongsTo(this.resource2);
                 this.resource2._associations.should.have.property('resources1')
                 .that.is.eql({
-                    type: '1x1',
+                    type: '1xM',
                     foreignKey: 'resource2_id',
                     localKey: 'id'
                 });
@@ -516,7 +580,7 @@ describe('Resource', function() {
                 this.resource1.hasMany(this.resource2);
                 this.resource2._associations.should.have.property('resources1')
                 .that.is.eql({
-                    type: '1xM',
+                    type: '1x1',
                     foreignKey: 'key',
                     localKey: 'resource1_key',
                 });
