@@ -1,5 +1,5 @@
 
-describe('GET /api/v1.0/users/:id', function() {
+describe('GET /api/v1.0/users/:username', function() {
     before(function() {
         return this.knex('users').insert({
             username: 'happie',
@@ -19,7 +19,11 @@ describe('GET /api/v1.0/users/:id', function() {
         const expect = this.expect;
         const userId = this.userId;
 
-        return this.sdk.getUser(this.userId).should.be.fulfilled.then(function(response) {
+        /*
+         * get users/:username can has the same sdk method as get users/:id
+         * so lets use sdk.getUser
+         */
+        return this.sdk.getUser('happie').should.be.fulfilled.then(function(response) {
             Object.keys(response.data).should.be.eql(['id','username', 'subscribed', 'created_at', 'updated_at']);
 
             expect(response.data.id).to.equal(userId);
@@ -30,32 +34,23 @@ describe('GET /api/v1.0/users/:id', function() {
         });
     });
 
-    it('should not accept _embed query parameter', function() {
-        const expect = this.expect;
-        const userId = this.userId;
-
-        return this.sdk.getUser(this.userId, {
-            query: {_embed: '!@*($&!)'}
-        }).should.be.fulfilled;
-    });
-
     it('should return 400 json response with user.notFound api code', function() {
         const expect = this.expect;
 
-        return this.sdk.getUser(1000000).should.be.rejected.then(function(response) {
+        return this.sdk.getUser('not-happy').should.be.rejected.then(function(response) {
             expect(response.code).to.be.equal(400);
             expect(response.apiCode).to.be.equal('user.notFound');
             expect(response.message).to.be.equal('user not found');
         });
     });
 
-    it('should return 400 json response with validation error when primary key is too large', function() {
+    it('should return 400 json response with validation error when invalid primary key value is provided', function() {
         const expect = this.expect;
 
-        return this.sdk.getUser('100000000').should.be.rejected.then(function(response) {
+        return this.sdk.getUser('invalid+value').should.be.rejected.then(function(response) {
             expect(response.code).to.be.equal(400);
             expect(response.apiCode).to.be.equal('validationFailure');
-            expect(response.message).to.be.equal('.id should be <= 10000000');
+            expect(response.message).to.be.equal('.username should match pattern "^[a-z-_]+$"');
         });
     });
 });

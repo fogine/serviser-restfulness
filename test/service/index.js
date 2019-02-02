@@ -60,24 +60,25 @@ function createEndpoints() {
     });
 
     users.get('/'); //get users
-    users.get('/:{key}'); //get user
-    users.get('/@movies/'); //get user movies
-    users.get('/@movies/:{key}'); //get user movie
-    users.get('/@reviews/'); //get user reviews
-    users.get('/@reviews/:{key}'); //get user review
+    users.get('/:{key}(\\d+)'); //get user
+    users.get('/:username', {name: 'userByUsername'}); //get user by username
+    users.get('/:{key}/@movies/'); //get user movies
+    users.get('/:{key}/@movies/:{key}'); //get user movie
+    users.get('/:{key}/@reviews/'); //get user reviews
+    users.get('/:{key}/@reviews/:{key}'); //get user review
 
     users.post('/'); //register new user
-    users.post('/@reviews'); //create new user review
+    users.post('/:{key}/@reviews'); //create new user review
 
     users.put('/:{key}'); //update user
-    users.put('/@movies/:{key}'); //assign a movie to the user
-    users.put('/@reviews/:{key}'); //update user review
+    users.put('/:{key}/@movies/:{key}'); //assign a movie to the user
+    users.put('/:{key}/@reviews/:{key}'); //update user review
 
-    users.del('/@movies/:{key}'); //deassign a movie from the user
-    users.del('/@reviews/:{key}'); //delete a user review
+    users.del('/:{key}/@movies/:{key}'); //deassign a movie from the user
+    users.del('/:{key}/@reviews/:{key}'); //delete a user review
 
     movies.get('/');//get movies
-    movies.get('/@reviews');//get movie reviews
+    movies.get('/:{key}/@reviews');//get movie reviews
 
     movies.post('/');//create new movie
     movies.put('/:{key}');//update a movie
@@ -127,7 +128,7 @@ function createResources() {
             updated_at: 'datetime'
         },
         properties: {
-            username: {type: 'string', minLength: 4, maxLength: 16},
+            username: {type: 'string', minLength: 4, maxLength: 16, pattern: '^[a-z-_]+$'},
             password: {type: 'string', maxLength: 32},
             subscribed: {type: 'boolean', default: false},
             email: {type: 'string', format: 'email'}
