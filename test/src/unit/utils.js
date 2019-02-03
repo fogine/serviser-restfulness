@@ -187,11 +187,10 @@ describe('utils', function() {
             let segment1 = new this.QuerySegment(this.users);
             let segment2 = new this.QuerySegment(this.posts);
 
-            segment1.reduceBy('id');
-            segment2.reduceBy('id');
-
             urlSegments.push(segment1, segment2);
 
+            segment1.reduceBy('id');
+            segment2.reduceBy('id');
 
             let url =  utils.normalizeUrl(
                 '/api/{version}/@users/:{key}/@posts/:{key}',
