@@ -105,7 +105,10 @@ describe('GET /api/v1.0/reviews', function() {
         const movieIds = this.movieIds;
 
         return this.sdk.getReviews({
-            query: {_embed: 'user,movie'}
+            query: {
+                _embed: 'user,movie',
+                _order: 'id'
+            }
         }).should.be.fulfilled.then(function(response) {
             expect(response.status).to.be.equal(200);
             expect(response.data.length).to.be.equal(20);
@@ -148,7 +151,10 @@ describe('GET /api/v1.0/reviews', function() {
         const movieIds = this.movieIds;
 
         return this.sdk.getReviews({
-            query: {_embed: 'user.username,movie.name,user.subscribed'}
+            query: {
+                _embed: 'user.username,movie.name,user.subscribed',
+                _order: 'id'
+            }
         }).should.be.fulfilled.then(function(response) {
             expect(response.status).to.be.equal(200);
             expect(response.data.length).to.be.equal(20);
