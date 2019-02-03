@@ -1,10 +1,11 @@
-const Promise        = require('bluebird');
-const chai           = require('chai');
-const Service        = require('bi-service');
-const path           = require('path');
-const _              = require('lodash');
-const ServiceSDK     = require('../../service/sdk.js');
-const chaiAsPromised = require('chai-as-promised');
+const Promise         = require('bluebird');
+const chai            = require('chai');
+const Service         = require('bi-service');
+const path            = require('path');
+const _               = require('lodash');
+const chaiAsPromised  = require('chai-as-promised');
+const parseLinkHeader = require('parse-link-header');
+const ServiceSDK      = require('../../service/sdk.js');
 
 //import the restfulness plugin
 require('../../../index.js');
@@ -27,6 +28,7 @@ describe('integration tests', function() {
         this.chai = chai;
         this.Promise = Promise;
         this._ = _;
+        this.parseLinkHeader = parseLinkHeader;
     });
 
     describe('postgres database', function() {

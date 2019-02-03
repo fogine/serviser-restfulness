@@ -126,6 +126,33 @@ TestServiceSDK.prototype.getUser = function getUser(id, options) {
 };
 /**
  * @method
+ * @name TestServiceSDK#getReviews
+ * @operationId getUsers_v1.0
+ * @summary 
+ *
+ * @param {Object} options
+ * @param {Object} options.data - request body payload in case of PUT|POST|DELETE, query parameters otherwise
+ * @param {Object} [options.query]
+ * @param {Object} [options.headers]
+ * @param {Object} options.path
+ * @return {Promise<Object>}
+ */
+TestServiceSDK.prototype.getReviews = function getReviews(options) {
+
+
+    var opt = {
+        url     : "/reviews",
+        method  : "get",
+        data    : (options && options.data) !== undefined ? options.data : {},
+        params  : (options && options.query) !== undefined ? options.query : {},
+        headers : (options && options.headers) !== undefined ? options.headers : {}
+    };
+
+
+    return this.$request(opt);
+};
+/**
+ * @method
  * @name TestServiceSDK#getReview
  * @operationId getUser_v1.0
  * @summary 

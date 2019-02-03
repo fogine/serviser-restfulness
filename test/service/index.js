@@ -1,11 +1,13 @@
 const Service = require('bi-service');
 const Config  = require('bi-config');
 const Knex    = require('bi-service-knex');
+const pg      = require('pg');
 const Resource = require('../../lib/resource.js');
-const pgTypes  = require('pg').types;
 
-// override parsing date column to Date()
-pgTypes.setTypeParser(1184, val => val);
+// override parsing date column to Date() so that it returns strings
+pg.types.setTypeParser(1184, val => val);
+// select count() operations will not return strings
+pg.defaults.parseInt8 = true;
 
 module.exports = createService;
 
@@ -16,7 +18,9 @@ module.exports = createService;
 function createService(dbProvider) {
     const config = Config.createMemoryProvider({
         apps: {
-            test: {}
+            test: {
+                baseUrl: 'http://127.0.0.1'
+            }
         }
     });
 
@@ -84,6 +88,7 @@ function createEndpoints() {
     movies.put('/:{key}');//update a movie
     movies.del('/:{key}');//delete a movie
 
+    reviews.get('/'); //get reviews
     reviews.get('/:{key}'); //get review
 }
 
