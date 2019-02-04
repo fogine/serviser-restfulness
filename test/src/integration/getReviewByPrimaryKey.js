@@ -88,6 +88,7 @@ describe('GET /api/v1.0/reviews/:id', function() {
                 },
                 movie: {
                     id: movieId,
+                    country_id: 0, //TODO should be null, update bi-service ajv and define field as nullable
                     name: 'Star Trek',
                     rating: 10
                 }

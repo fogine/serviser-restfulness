@@ -107,7 +107,7 @@ describe('GET /api/v1.0/reviews', function() {
         return this.sdk.getReviews({
             query: {
                 _embed: 'user,movie',
-                _order: 'id'
+                _sort: 'id'
             }
         }).should.be.fulfilled.then(function(response) {
             expect(response.status).to.be.equal(200);
@@ -137,6 +137,7 @@ describe('GET /api/v1.0/reviews', function() {
                     movie: {
                         id: movieIds[index],
                         name: `Title${index+1}`,
+                        country_id: 0,
                         rating: 10
                     }
                 })
@@ -153,7 +154,7 @@ describe('GET /api/v1.0/reviews', function() {
         return this.sdk.getReviews({
             query: {
                 _embed: 'user.username,movie.name,user.subscribed',
-                _order: 'id'
+                _sort: 'id'
             }
         }).should.be.fulfilled.then(function(response) {
             expect(response.status).to.be.equal(200);

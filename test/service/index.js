@@ -126,6 +126,20 @@ function getDbConnectionOptions(dbProvider) {
  *
  */
 function createResources() {
+    const country = new Resource({
+        singular: 'country',
+        plural: 'countries',
+        properties: {
+            name: {type: 'string', maxLength: 16},
+            code_2: {type: 'string', minLength: 2, maxLength: 2}
+        },
+        responseProperties: {
+            id: {type: 'integer'},
+            name: {type: 'string'},
+            code_2: {type: 'string'}
+        }
+    });
+
     const user = new Resource({
         singular: 'user',
         plural: 'users',
@@ -171,18 +185,21 @@ function createResources() {
         properties: {
             name: {type: 'string'},
             description: {type: 'string', maxLength: 256},
-            released_at: {type: 'string', format: 'date'}
+            released_at: {type: 'string', format: 'date'},
+            country_id: {type: 'integer'}
         },
         responseProperties: {
             id: {type: 'integer'},
             name: {type: 'string'},
             released_at: {type: 'string'},
-            rating: {type: 'number'},//cauculated
+            country_id: {type: 'integer'},
+            rating: {type: 'number'},//calculated
         }
     });
 
     user.belongsToMany(movie);
     movie.hasMany(review);
+    movie.belongsTo(country);
     user.hasMany(review);
     review.belongsTo(user);
     review.belongsTo(movie);
