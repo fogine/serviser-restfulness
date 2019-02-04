@@ -83,6 +83,8 @@ function createEndpoints() {
 
     movies.get('/');//get movies
     movies.get('/:{key}/@reviews');//get movie reviews
+    movies.get('/:{key}/@countries/:{key}(\\d+)');//get movie country
+    movies.get('/:{key}/@countries/:code_2', {name: 'moviesCountryByCode2'});//get movie country
 
     movies.post('/');//create new movie
     movies.put('/:{key}');//update a movie

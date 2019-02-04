@@ -595,6 +595,56 @@ TestServiceSDK.prototype.getMovies = function getMovies(options) {
 };
 /**
  * @method
+ * @name TestServiceSDK#getMoviesCountry
+ * @operationId getMoviesCountry_v1.0
+ * @summary 
+ *
+ * @param {integer} [movie_id]
+ * @param {integer} [movie_id]
+ * @param {Object} options
+ * @param {Object} options.data - request body payload in case of PUT|POST|DELETE, query parameters otherwise
+ * @param {Object} [options.query]
+ * @param {Object} [options.headers]
+ * @param {Object} options.path
+ * @param {integer} [options.path.id]
+ * @return {Promise<Object>}
+ */
+TestServiceSDK.prototype.getMoviesCountry = function getMoviesCountry(movie_id, country_id, options) {
+
+    if (typeof movie_id === 'object' && movie_id !== null && typeof options === 'undefined') {
+        options = movie_id;
+        movie_id = undefined;
+        country_id = undefined;
+    }
+
+    if (typeof country_id === 'object' && country_id !== null && typeof options === 'undefined') {
+        options = country_id;
+        country_id = undefined;
+    }
+
+    if (typeof movie_id === 'undefined') {
+        movie_id = options && options.path && options.path['movie_id'];
+    }
+
+    if (typeof country_id === 'undefined') {
+        country_id = options && options.path && options.path['country_id'];
+    }
+
+    var opt = {
+        url     : "/movies/{movie_id}/countries/{country_id}",
+        method  : "get",
+        data    : (options && options.data) !== undefined ? options.data : {},
+        params  : (options && options.query) !== undefined ? options.query : {},
+        headers : (options && options.headers) !== undefined ? options.headers : {}
+    };
+
+    opt.url = opt.url.replace(/{movie_id}/, movie_id);
+    opt.url = opt.url.replace(/{country_id}/, country_id);
+
+    return this.$request(opt);
+};
+/**
+ * @method
  * @name TestServiceSDK#postMovies
  * @operationId postMovies_v1.0
  * @summary 
