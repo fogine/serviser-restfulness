@@ -233,24 +233,35 @@ TestServiceSDK.prototype.putUser = function putUser(id, options) {
  * @operationId getUsersMovies_v1.0
  * @summary 
  *
+ * @param {integer} id - user id
  * @param {Object} options
  * @param {Object} options.data - request body payload in case of PUT|POST|DELETE, query parameters otherwise
  * @param {Object} [options.query]
  * @param {Object} [options.headers]
  * @param {Object} options.path
+ * @param {Object} options.path.id
  * @return {Promise<Object>}
  */
-TestServiceSDK.prototype.getUsersMovies = function getUsersMovies(options) {
+TestServiceSDK.prototype.getUsersMovies = function getUsersMovies(id, options) {
 
+    if (typeof id === 'object' && id !== null && typeof options === 'undefined') {
+        options = id;
+        id = undefined;
+    }
+
+    if (typeof id === 'undefined') {
+        id = options && options.path && options.path['id'];
+    }
 
     var opt = {
-        url     : "/users/movies",
+        url     : "/users/{id}/movies",
         method  : "get",
         data    : (options && options.data) !== undefined ? options.data : {},
         params  : (options && options.query) !== undefined ? options.query : {},
         headers : (options && options.headers) !== undefined ? options.headers : {}
     };
 
+    opt.url = opt.url.replace(/{id}/, id);
 
     return this.$request(opt);
 };
