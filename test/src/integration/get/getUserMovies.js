@@ -1,25 +1,3 @@
-/**
- * @param {Array<Int>} ids
- * @param {String} bindName
- * @this {Object} test context
- */
-function fillInIds(ids, bindName) {
-    this[bindName] = ids;
-
-    if (ids.length == 1) {
-        /*
-         * If you insert multiple rows using a single INSERT statement,
-         * LAST_INSERT_ID() returns the value generated for the first inserted row only.
-         * The reason for this is to make it possible to reproduce
-         * easily the same INSERT statement against some other server.
-         * https://github.com/tgriesser/knex/issues/86
-         */
-        for (let i = ids[0]+1, len = ids[0]+20; i < len; i++) {
-            this[bindName].push(i);
-        }
-    }
-}
-
 describe('GET /api/v1.0/users/:column/movies', function() {
     before(function() {
 
@@ -51,7 +29,7 @@ describe('GET /api/v1.0/users/:column/movies', function() {
 
             return this.knex.batchInsert('movies', movieRows, 20).returning('id');
         }).bind(this).then(function(ids) {
-            fillInIds.call(this, ids, 'movieIds');
+            this.movieIds = this.utils.expandResourceIds(ids, 20);
 
             const moviesUsersRows = [];
             for (let i = 0, len = 20; i < len; i++) {
@@ -63,7 +41,7 @@ describe('GET /api/v1.0/users/:column/movies', function() {
 
             return this.knex.batchInsert('movies_users', moviesUsersRows, 20).returning('id');
         }).bind(this).then(function(ids) {
-            fillInIds.call(this, ids, 'moviesUsersIds');
+            this.moviesUsersIds = this.utils.expandResourceIds(ids, 20);
         });
     });
 

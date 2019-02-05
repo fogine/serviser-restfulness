@@ -68,7 +68,8 @@ function createEndpoints() {
     users.get('/:username'); //get user by username
     users.get('/:{key}/@movies/'); //get user movies
     users.get('/:{key}/@movies/:{key}'); //get user movie
-    users.get('/:{key}/@reviews/'); //get user reviews
+    users.get('/:{key}(\\d+)/@reviews/'); //get user reviews
+    users.get('/:username/@reviews/'); //get user reviews
     users.get('/:{key}/@reviews/:{key}'); //get user review
 
     users.post('/'); //register new user

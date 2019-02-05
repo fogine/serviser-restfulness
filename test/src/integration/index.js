@@ -6,6 +6,7 @@ const _               = require('lodash');
 const chaiAsPromised  = require('chai-as-promised');
 const parseLinkHeader = require('parse-link-header');
 const ServiceSDK      = require('../../service/sdk.js');
+const testUtils       = require('../../utils.js');
 
 //import the restfulness plugin
 require('../../../index.js');
@@ -29,6 +30,7 @@ describe('integration tests', function() {
         this.Promise = Promise;
         this._ = _;
         this.parseLinkHeader = parseLinkHeader;
+        this.utils = testUtils;
     });
 
     describe('postgres database', function() {
