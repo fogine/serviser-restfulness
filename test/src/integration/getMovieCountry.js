@@ -49,7 +49,7 @@ describe('GET /api/v1.0/movies/:movie_column/country/:country_column', function(
         });
     });
 
-    it.only('should fetch country association by code_2 and return 200 response', function() {
+    it('should fetch country association by code_2 and return 200 response', function() {
         const expect = this.expect;
         const movieId = this.movieId;
         const countryId = this.countryId;
