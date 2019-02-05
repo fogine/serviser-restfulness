@@ -65,7 +65,7 @@ function createEndpoints() {
 
     users.get('/'); //get users
     users.get('/:{key}(\\d+)'); //get user
-    users.get('/:username', {name: 'userByUsername'}); //get user by username
+    users.get('/:username'); //get user by username
     users.get('/:{key}/@movies/'); //get user movies
     users.get('/:{key}/@movies/:{key}'); //get user movie
     users.get('/:{key}/@reviews/'); //get user reviews
@@ -84,7 +84,7 @@ function createEndpoints() {
     movies.get('/');//get movies
     movies.get('/:{key}/@reviews');//get movie reviews
     movies.get('/:{key}/@countries/:{key}(\\d+)');//get movie country
-    movies.get('/:{key}/@countries/:code_2', {name: 'moviesCountryByCode2'});//get movie country
+    movies.get('/:{key}/@countries/:code_2');//get movie country
 
     movies.post('/');//create new movie
     movies.put('/:{key}');//update a movie
