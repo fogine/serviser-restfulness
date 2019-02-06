@@ -59,7 +59,22 @@ describe('GET /api/v1.0/users/:user_id/movies/:movie_id', function() {
         const userId = this.userId;
         const movieId = this.movieId;
 
-        return this.sdk.getUsersMovie(userId, movieId).should.be.fulfilled.then(function(response) {
+        return this.sdk.getUsersMovie(userId, movieId).then(function(response) {
+            Object.keys(response.data).should.be.eql(['id','name', 'released_at', 'country_id', 'rating']);
+
+            expect(response.data.id).to.equal(movieId);
+            expect(response.data.name).to.equal('name');
+            expect(response.data.released_at).to.be.a('string');
+            expect(response.data.rating).to.be.equal(10);
+        });
+    });
+
+    it(`should fetch movie details via user's username and movie's name`, function() {
+        const expect = this.expect;
+        const userId = this.userId;
+        const movieId = this.movieId;
+
+        return this.sdk.getUsersMovie('happie', 'name').then(function(response) {
             Object.keys(response.data).should.be.eql(['id','name', 'released_at', 'country_id', 'rating']);
 
             expect(response.data.id).to.equal(movieId);
@@ -77,7 +92,7 @@ describe('GET /api/v1.0/users/:user_id/movies/:movie_id', function() {
 
         return this.sdk.getUsersMovie(userId, movieId, {
             query: {_embed: 'country'}
-        }).should.be.fulfilled.then(function(response) {
+        }).then(function(response) {
             Object.keys(response.data).should.be.eql(['id','name', 'released_at', 'country_id', 'rating', 'country']);
 
             expect(response.data.id).to.equal(movieId);

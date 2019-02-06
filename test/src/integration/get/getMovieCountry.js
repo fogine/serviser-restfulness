@@ -40,7 +40,7 @@ describe('GET /api/v1.0/movies/:movie_column/country/:country_column', function(
         const movieId = this.movieId;
         const countryId = this.countryId;
 
-        return this.sdk.getMoviesCountry(movieId, countryId).should.be.fulfilled.then(function(response) {
+        return this.sdk.getMoviesCountry(movieId, countryId).then(function(response) {
             Object.keys(response.data).should.be.eql(['id', 'name', 'code_2']);
 
             expect(response.data.id).to.equal(countryId);
@@ -54,7 +54,21 @@ describe('GET /api/v1.0/movies/:movie_column/country/:country_column', function(
         const movieId = this.movieId;
         const countryId = this.countryId;
 
-        return this.sdk.getMoviesCountry(movieId, 'US').should.be.fulfilled.then(function(response) {
+        return this.sdk.getMoviesCountry(movieId, 'US').then(function(response) {
+            Object.keys(response.data).should.be.eql(['id', 'name', 'code_2']);
+
+            expect(response.data.id).to.equal(countryId);
+            expect(response.data.name).to.equal('United States');
+            expect(response.data.code_2).to.be.equal('US');
+        });
+    });
+
+    it('should fetch country association by movie name and code_2', function() {
+        const expect = this.expect;
+        const movieId = this.movieId;
+        const countryId = this.countryId;
+
+        return this.sdk.getMoviesCountry('name', 'US').then(function(response) {
             Object.keys(response.data).should.be.eql(['id', 'name', 'code_2']);
 
             expect(response.data.id).to.equal(countryId);

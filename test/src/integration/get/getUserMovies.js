@@ -71,7 +71,32 @@ describe('GET /api/v1.0/users/:column/movies', function() {
             query: {
                 _sort: 'id'
             }
-        }).should.be.fulfilled.then(function(response) {
+        }).then(function(response) {
+            expect(response.data.length).to.be.equal(20);
+
+            response.data.forEach(function(movie, index) {
+                Object.keys(movie).should.be.eql(['id', 'name', 'released_at', 'country_id', 'rating']);
+
+                expect(movie.id).to.equal(movieIds[index]);
+                expect(movie.name).to.equal(`Title${index+1}`);
+                expect(movie.rating).to.equal(10);
+                expect(movie.country_id).to.be.equal(countryId);
+                expect(movie.released_at).to.be.a('string');
+            });
+        });
+    });
+
+    it('should fetch collection of all users` movies via users username', function() {
+        const expect = this.expect;
+        const userId = this.userId;
+        const countryId = this.countryId;
+        const movieIds = this.movieIds;
+
+        return this.sdk.getUsersMovies('happie', {
+            query: {
+                _sort: 'id'
+            }
+        }).then(function(response) {
             expect(response.data.length).to.be.equal(20);
 
             response.data.forEach(function(movie, index) {
@@ -97,7 +122,7 @@ describe('GET /api/v1.0/users/:column/movies', function() {
                 _sort: 'id',
                 name: 'Title1'
             }
-        }).should.be.fulfilled.then(function(response) {
+        }).then(function(response) {
             expect(response.data.length).to.be.equal(1);
 
             response.data.forEach(function(movie, index) {
@@ -123,7 +148,7 @@ describe('GET /api/v1.0/users/:column/movies', function() {
                 _embed: 'country',
                 _sort: 'id'
             }
-        }).should.be.fulfilled.then(function(response) {
+        }).then(function(response) {
             expect(response.status).to.be.equal(200);
             expect(response.data.length).to.be.equal(20);
 
@@ -155,7 +180,7 @@ describe('GET /api/v1.0/users/:column/movies', function() {
                 _embed: 'country.code_2',
                 _sort: 'id'
             }
-        }).should.be.fulfilled.then(function(response) {
+        }).then(function(response) {
             expect(response.status).to.be.equal(200);
             expect(response.data.length).to.be.equal(20);
 
