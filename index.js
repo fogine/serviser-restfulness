@@ -41,3 +41,37 @@ App.prototype.buildRestfulRouter = function(options) {
 
     return router;
 };
+
+
+/**
+ * @param {String} resource - plural|singular resource name
+ * @param {Route}  route
+ * @param {String} httpMethod - get|post|put|del
+ *
+ * @return {Route}
+ */
+App.prototype.$setRoutesForResource = function(resource, route, httpMethod) {
+    if (!this.$restfulness) {
+        Object.defineProperty(this, '$restfulness', {
+            value: {get: {}, post: {}, put: {}, del: {}}
+        });
+    }
+
+    if (!this.$restfulness[httpMethod].hasOwnProperty(resource)) {
+        this.$restfulness[httpMethod][resource] = [];
+    }
+
+    this.$restfulness[httpMethod][resource].push(route);
+};
+
+/**
+ * @param {Resource} resource
+ * @param {String} httpMethod
+ *
+ * @return {Route}
+ */
+App.prototype.$getRoutesForResource = function(resource, httpMethod) {
+    if (this.$restfulness) {
+        return this.$restfulness[httpMethod][resource];
+    }
+};

@@ -1,9 +1,11 @@
+const pg              = require('pg');
 const Promise         = require('bluebird');
 const chai            = require('chai');
 const Service         = require('bi-service');
 const path            = require('path');
 const _               = require('lodash');
 const chaiAsPromised  = require('chai-as-promised');
+const chaiDateString  = require('chai-date-string');
 const parseLinkHeader = require('parse-link-header');
 const ServiceSDK      = require('../../service/sdk.js');
 const testUtils       = require('../../utils.js');
@@ -13,6 +15,7 @@ require('../../../index.js');
 
 const expect = chai.expect;
 chai.use(chaiAsPromised);
+chai.use(chaiDateString);
 chai.should();
 
 //
@@ -35,7 +38,7 @@ describe('integration tests', function() {
 
     describe('postgres database', function() {
         before(function() {
-            return initService.call(this, 'pg');
+            return initService.call(this, 'pg', 3001);
         });
 
         loadTestFiles();
@@ -43,7 +46,7 @@ describe('integration tests', function() {
 
     describe('mysql database', function() {
         before(function() {
-            return initService.call(this, 'mysql');
+            return initService.call(this, 'mysql', 3000);
         });
 
         loadTestFiles();
@@ -51,17 +54,20 @@ describe('integration tests', function() {
 
     /**
      * @param {String} dbProvider
+     * @param {Integer} port
      * @return {Promise}
      */
-    function initService(dbProvider) {
+    function initService(dbProvider, port) {
         const self = this;
 
-        this.service = require('../../service/index.js')(dbProvider);
+        this.service = require('../../service/index.js')(dbProvider, port);
         this.knex = this.service.knex;
 
         return this.service.listen().then(function() {
-            let port = self.service.appManager.get('test').server.address().port;
+            const app = self.service.appManager.get('test');
+            let port = app.server.address().port;
 
+            self.port = port;
             self.sdk = new ServiceSDK({
                 baseURL: `http://127.0.0.1:${port}`
             });

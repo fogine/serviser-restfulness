@@ -73,25 +73,25 @@ describe('GET /api/v1.0/users', function() {
                 first: {
                     limit: '5',
                     rel: 'first',
-                    url: 'http://127.0.0.1/api/v1.0/users?limit=5'
+                    url: `http://127.0.0.1:${self.port}/api/v1.0/users?limit=5`
                 },
                 last: {
                     limit: '5',
                     offset: '15',
                     rel: 'last',
-                    url: 'http://127.0.0.1/api/v1.0/users?limit=5&offset=15'
+                    url: `http://127.0.0.1:${self.port}/api/v1.0/users?limit=5&offset=15`
                 },
                 next: {
                     offset: '10',
                     limit: '5',
                     rel: 'next',
-                    url: 'http://127.0.0.1/api/v1.0/users?offset=10&limit=5'
+                    url: `http://127.0.0.1:${self.port}/api/v1.0/users?offset=10&limit=5`
                 },
                 prev: {
                     offset: '0',
                     limit: '5',
                     rel: 'prev',
-                    url: 'http://127.0.0.1/api/v1.0/users?offset=0&limit=5'
+                    url: `http://127.0.0.1:${self.port}/api/v1.0/users?offset=0&limit=5`
                 }
             });
 
@@ -159,12 +159,12 @@ describe('GET /api/v1.0/users', function() {
             link.should.be.eql({
                 first: {
                     rel: 'first',
-                    url: 'http://127.0.0.1/api/v1.0/users'
+                    url: `http://127.0.0.1:${self.port}/api/v1.0/users`
                 },
                 last: {
                     offset: '0',
                     rel: 'last',
-                    url: 'http://127.0.0.1/api/v1.0/users?offset=0'
+                    url: `http://127.0.0.1:${self.port}/api/v1.0/users?offset=0`
                 }
             });
 

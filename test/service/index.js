@@ -4,22 +4,25 @@ const Knex    = require('bi-service-knex');
 const pg      = require('pg');
 const Resource = require('../../lib/resource.js');
 
-// override parsing date column to Date() so that it returns strings
-pg.types.setTypeParser(1184, val => val);
-// select count() operations will not return strings
-pg.defaults.parseInt8 = true;
-
 module.exports = createService;
 
 /**
  * @param {String} dbProvider
+ * @param {Integer} port
  * @return {Service}
  */
-function createService(dbProvider) {
+function createService(dbProvider, port) {
     const config = Config.createMemoryProvider({
         apps: {
             test: {
-                baseUrl: 'http://127.0.0.1'
+                listen: port,
+                baseUrl: `http://127.0.0.1:${port}`,
+                bodyParser: {
+                    'application/json': {
+                        limit: "2mb",
+                        extended: false
+                    }
+                },
             }
         }
     });
@@ -105,6 +108,11 @@ function createEndpoints() {
  */
 function getDbConnectionOptions(dbProvider) {
     if (dbProvider === 'pg') {
+        // override parsing date column to Date() so that it returns strings
+        pg.types.setTypeParser(1184, val => val);
+        // select count() operations will not return strings
+        pg.defaults.parseInt8 = true;
+
         return {
             client: 'pg',
             connection: {
@@ -122,7 +130,14 @@ function getDbConnectionOptions(dbProvider) {
                 user : process.env.MYSQL_USER,
                 password : process.env.MYSQL_PASSWORD,
                 database : process.env.MYSQL_DATABASE,
-                dateStrings: true
+                dateStrings: true,
+                //converts tinyint(1) to booleans instead of integers
+                typeCast: function (field, next) {
+                    if (field.type == 'TINY' && field.length == 1) {
+                        return (field.string() == '1'); // 1 = true, 0 = false
+                    }
+                    return next();
+                }
             }
         };
     }
@@ -149,9 +164,7 @@ function createResources() {
     const user = new Resource({
         singular: 'user',
         plural: 'users',
-        dynamicDefaults: {
-            updated_at: 'datetime'
-        },
+        dynamicDefaults: {},
         properties: {
             username: {type: 'string', minLength: 4, maxLength: 16, pattern: '^[a-z-_]+$'},
             password: {type: 'string', maxLength: 32},

@@ -9,7 +9,7 @@ BEGIN;
         email VARCHAR(32),
         subscribed BOOLEAN DEFAULT false,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         PRIMARY KEY (id),
         CONSTRAINT users_username_key UNIQUE(username),
         CONSTRAINT users_email_key UNIQUE(email)
