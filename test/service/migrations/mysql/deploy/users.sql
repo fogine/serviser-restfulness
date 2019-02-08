@@ -11,8 +11,8 @@ BEGIN;
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         PRIMARY KEY (id),
-        CONSTRAINT users_username_key UNIQUE(username),
-        CONSTRAINT users_email_key UNIQUE(email)
+        CONSTRAINT users__username__key UNIQUE(username),
+        CONSTRAINT users__email__key UNIQUE(email)
     );
 
 COMMIT;

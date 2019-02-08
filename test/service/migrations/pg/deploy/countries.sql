@@ -8,6 +8,6 @@ BEGIN;
         code_2 character varying(2)
     );
 
-    ALTER TABLE ONLY countries ADD CONSTRAINT countries_name_key UNIQUE (name);
+    ALTER TABLE ONLY countries ADD CONSTRAINT countries__name__key UNIQUE (name);
 
 COMMIT;

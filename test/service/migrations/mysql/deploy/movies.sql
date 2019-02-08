@@ -10,7 +10,7 @@ BEGIN;
         rating decimal,
         country_id INT,
         PRIMARY KEY (id),
-        CONSTRAINT movies_name_key UNIQUE(name),
+        CONSTRAINT movies__name__key UNIQUE(name),
         FOREIGN KEY (country_id) REFERENCES countries(id)
     );
 

@@ -11,8 +11,8 @@ BEGIN;
         country_id integer
     );
 
-    ALTER TABLE ONLY movies ADD CONSTRAINT movies_name_key UNIQUE (name);
-    ALTER TABLE ONLY movies ADD CONSTRAINT movies_country_id_fkey
+    ALTER TABLE ONLY movies ADD CONSTRAINT movies__name__key UNIQUE (name);
+    ALTER TABLE ONLY movies ADD CONSTRAINT movies__country_id__fkey
         FOREIGN KEY (country_id) REFERENCES countries(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 COMMIT;

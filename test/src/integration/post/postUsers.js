@@ -77,4 +77,19 @@ describe('POST /api/v1.0/users', function() {
             expect(response.message).to.be.match(/\.username/);
         });
     });
+
+    it('should fail with 400 user.alreadyExists apiCode', function() {
+        const expect = this.expect;
+
+        return this.sdk.postUsers({data: {
+            username: 'happie',
+            password: 'verysecretpassword',
+            subscribed: true,
+            email: 'email2@email.com'
+        }}).should.be.rejected.then(function(response) {
+            expect(response.code).to.be.equal(400);
+            expect(response.apiCode).to.be.equal('uniqueConstraintFailure');
+            expect(response.message).to.be.match(/username/);
+        });
+    });
 });

@@ -10,10 +10,10 @@ BEGIN;
         comment character varying(255)
     );
 
-    ALTER TABLE ONLY reviews ADD CONSTRAINT reviews_movie_id_fkey
+    ALTER TABLE ONLY reviews ADD CONSTRAINT reviews__movie_id__fkey
     FOREIGN KEY (movie_id) REFERENCES movies(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
-    ALTER TABLE ONLY reviews ADD CONSTRAINT reviews_user_id_fkey
+    ALTER TABLE ONLY reviews ADD CONSTRAINT reviews__user_id__fkey
     FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 COMMIT;

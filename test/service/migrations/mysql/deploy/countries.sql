@@ -6,6 +6,6 @@ BEGIN;
         name varchar(32),
         code_2 varchar(2),
         PRIMARY KEY (id),
-        CONSTRAINT countries_name_key UNIQUE(name)
+        CONSTRAINT countries__name__key UNIQUE(name)
     );
 COMMIT;

@@ -12,6 +12,6 @@ BEGIN;
         updated_at timestamp with time zone NOT NULL default current_timestamp
     );
 
-    ALTER TABLE ONLY users ADD CONSTRAINT users_username_key UNIQUE (username);
-    ALTER TABLE ONLY users ADD CONSTRAINT users_email_key UNIQUE (email);
+    ALTER TABLE ONLY users ADD CONSTRAINT users__username__key UNIQUE (username);
+    ALTER TABLE ONLY users ADD CONSTRAINT users__email__key UNIQUE (email);
 COMMIT;

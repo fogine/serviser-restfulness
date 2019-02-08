@@ -1,8 +1,10 @@
-const Service = require('bi-service');
-const Config  = require('bi-config');
-const Knex    = require('bi-service-knex');
-const pg      = require('pg');
-const Resource = require('../../lib/resource.js');
+const Service   = require('bi-service');
+const Config    = require('bi-config');
+const Knex      = require('bi-service-knex');
+const pg        = require('pg');
+const Resource  = require('../../lib/resource.js');
+const KnexError = require('../../lib/error/knexError.js');
+const RequestError = Service.error.RequestError;
 
 module.exports = createService;
 
@@ -50,6 +52,21 @@ function createService(dbProvider, port) {
 function createEndpoints() {
     const service = this;
     const app = service.buildApp('test');
+
+    app.on('unknown-error', function(err, errorHandler) {
+        if (err instanceof KnexError) {
+            if (err.code === '23505' || err.code === 'ER_DUP_ENTRY') {
+                if (err.message.match(/users__username__key/)) {
+                    return errorHandler(new RequestError({
+                        message: 'username already exists',
+                        apiCode: 'uniqueConstraintFailure'
+                    }));
+                }
+            }
+        }
+        //hand back the error processing to the application
+        return errorHandler(err);
+    });
 
     const users = app.buildRestfulRouter({
         url: '/api/{version}/@users',
