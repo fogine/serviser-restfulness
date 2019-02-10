@@ -35,6 +35,8 @@ describe('Router', function() {
             }
         });
 
+        this.users.hasMany(this.posts);
+
         this.router = this.app.buildRestfulRouter({
             url: '/api/{version}/@users',
             version: 1.0
