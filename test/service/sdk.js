@@ -434,29 +434,78 @@ TestServiceSDK.prototype.getUsersReviews = function getUsersReviews(id, options)
  * @operationId postUsersReviews_v1.0
  * @summary 
  *
+ * @param {Integer} id - user id
  * @param {Object} options
  * @param {Object} options.data - request body payload in case of PUT|POST|DELETE, query parameters otherwise
  * @param {Object} [options.query]
+ * @param {Object} [options.params]
  * @param {integer} [options.params.id]
- * @param {integer} [options.params.stars]
- * @param {string} [options.params.comment]
- * @param {integer} [options.params.movie_id]
- * @param {integer} [options.params.user_id]
  * @param {Object} [options.headers]
  * @param {Object} options.path
  * @return {Promise<Object>}
  */
-TestServiceSDK.prototype.postUsersReviews = function postUsersReviews(options) {
+TestServiceSDK.prototype.postUsersReviews = function postUsersReviews(id, options) {
 
+
+    if (typeof id === 'object' && id !== null && typeof options === 'undefined') {
+        options = id;
+        id = undefined;
+    }
+
+    if (typeof id === 'undefined') {
+        id = options && options.path && options.path['id'];
+    }
 
     var opt = {
-        url     : "/users/reviews",
+        url     : "/users/{id}/reviews",
         method  : "post",
         data    : (options && options.data) !== undefined ? options.data : {},
         params  : (options && options.query) !== undefined ? options.query : {},
         headers : (options && options.headers) !== undefined ? options.headers : {}
     };
 
+    opt.url = opt.url.replace(/{id}/, id);
+
+    return this.$request(opt);
+};
+
+/**
+ * @method
+ * @name TestServiceSDK#postUsersMovies
+ * @operationId postUsersReviews_v1.0
+ * @summary 
+ *
+ * @param {Integer} id - user id
+ * @param {Object} options
+ * @param {Object} options.data - request body payload in case of PUT|POST|DELETE, query parameters otherwise
+ * @param {Object} [options.query]
+ * @param {Object} [options.params]
+ * @param {integer} [options.params.id]
+ * @param {Object} [options.headers]
+ * @param {Object} options.path
+ * @return {Promise<Object>}
+ */
+TestServiceSDK.prototype.postUsersMovies = function postUsersMovies(id, options) {
+
+
+    if (typeof id === 'object' && id !== null && typeof options === 'undefined') {
+        options = id;
+        id = undefined;
+    }
+
+    if (typeof id === 'undefined') {
+        id = options && options.path && options.path['id'];
+    }
+
+    var opt = {
+        url     : "/users/{id}/movies",
+        method  : "post",
+        data    : (options && options.data) !== undefined ? options.data : {},
+        params  : (options && options.query) !== undefined ? options.query : {},
+        headers : (options && options.headers) !== undefined ? options.headers : {}
+    };
+
+    opt.url = opt.url.replace(/{id}/, id);
 
     return this.$request(opt);
 };

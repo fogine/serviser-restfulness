@@ -95,7 +95,9 @@ function createEndpoints() {
     users.get('/:{key}/@reviews/:{key}'); //get user review
 
     users.post('/'); //register new user
-    users.post('/:{key}/@reviews'); //create new user review
+    users.post('/:{key}(\\d+)/@reviews'); //create new user review
+    users.post('/:{key}/@movies'); //create a new movie and associate it with the user
+    users.post('/:username/@reviews'); //create new user review
 
     users.put('/:{key}'); //update user
     users.put('/:{key}/@movies/:{key}'); //assign a movie to the user
@@ -203,8 +205,8 @@ function createResources() {
         properties: {
             stars: {type: 'integer'},
             comment: {type: 'string', maxLength: 128},
-            movie_id: {type: 'integer'},
-            user_id: {type: 'integer'}
+            movie_id: {type: 'integer', minimum: 1},
+            user_id: {type: 'integer', minimum: 1}
         },
         responseProperties: {
             id: {type: 'integer'},
@@ -222,7 +224,7 @@ function createResources() {
             name: {type: 'string'},
             description: {type: 'string', maxLength: 256},
             released_at: {type: 'string', format: 'date'},
-            country_id: {type: 'integer'}
+            country_id: {type: 'integer', minimum: 1}
         },
         responseProperties: {
             id: {type: 'integer'},
