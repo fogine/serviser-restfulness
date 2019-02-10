@@ -42,7 +42,7 @@ describe('GET /api/v1.0/users', function() {
         const expect = this.expect;
         const userIds = this.userIds;
 
-        return this.sdk.getUsers().should.be.fulfilled.then(function(response) {
+        return this.sdk.getUsers().then(function(response) {
             expect(response.data.length).to.be.equal(20);
             response.data.forEach(function(user, index) {
                 Object.keys(user).should.be.eql(['id','username', 'subscribed', 'created_at', 'updated_at']);
@@ -64,7 +64,7 @@ describe('GET /api/v1.0/users', function() {
         return this.sdk.getUsers({query: {
             _limit: 5,
             _offset: 5
-        }}).should.be.fulfilled.then(function(response) {
+        }}).then(function(response) {
             expect(response.data.length).to.be.equal(5);
             expect(response.headers).to.have.property('link');
 
@@ -116,7 +116,7 @@ describe('GET /api/v1.0/users', function() {
         //TODO
         return this.sdk.getUsers({
             query: {_embed: '!@*($&!)'}
-        }).should.be.fulfilled;
+        });
     });
 
     it('should return ordered collection of resources', function() {
@@ -128,7 +128,7 @@ describe('GET /api/v1.0/users', function() {
             _limit: 5,
             _offset: 5,
             _sort: '-id,-created_at'
-        }}).should.be.fulfilled.then(function(response) {
+        }}).then(function(response) {
             expect(response.data.length).to.be.equal(5);
             expect(response.headers).to.have.property('link');
 
@@ -151,7 +151,7 @@ describe('GET /api/v1.0/users', function() {
 
         return this.sdk.getUsers({query: {
             id: userIds[0]
-        }}).should.be.fulfilled.then(function(response) {
+        }}).then(function(response) {
             expect(response.data.length).to.be.equal(1);
             expect(response.headers).to.have.property('link');
 
@@ -185,7 +185,7 @@ describe('GET /api/v1.0/users', function() {
 
         return this.sdk.getUsers({query: {
             username: 'happie20'
-        }}).should.be.fulfilled.then(function(response) {
+        }}).then(function(response) {
             expect(response.data.length).to.be.equal(1);
             expect(response.headers).to.have.property('link');
 
@@ -205,7 +205,7 @@ describe('GET /api/v1.0/users', function() {
 
         return this.sdk.getUsers({query: {
             password: 'secret15'
-        }}).should.be.fulfilled.then(function(response) {
+        }}).then(function(response) {
             expect(response.data.length).to.be.equal(20);
         });
     });

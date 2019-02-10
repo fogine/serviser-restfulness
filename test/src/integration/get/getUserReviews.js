@@ -66,7 +66,7 @@ describe('GET /api/v1.0/users/:column/reviews', function() {
             query: {
                 _sort: 'id'
             }
-        }).should.be.fulfilled.then(function(response) {
+        }).then(function(response) {
             expect(response.data.length).to.be.equal(20);
 
             response.data.forEach(function(review, index) {
@@ -91,7 +91,7 @@ describe('GET /api/v1.0/users/:column/reviews', function() {
             query: {
                 _sort: 'id'
             }
-        }).should.be.fulfilled.then(function(response) {
+        }).then(function(response) {
             expect(response.data.length).to.be.equal(20);
 
             response.data.forEach(function(review, index) {
@@ -117,7 +117,7 @@ describe('GET /api/v1.0/users/:column/reviews', function() {
                 _sort: 'id',
                 id: reviewIds[2]
             }
-        }).should.be.fulfilled.then(function(response) {
+        }).then(function(response) {
             expect(response.data.length).to.be.equal(1);
 
             response.data.forEach(function(review, index) {
@@ -143,7 +143,7 @@ describe('GET /api/v1.0/users/:column/reviews', function() {
                 _embed: 'movie',
                 _sort: 'id'
             }
-        }).should.be.fulfilled.then(function(response) {
+        }).then(function(response) {
             expect(response.status).to.be.equal(200);
             expect(response.data.length).to.be.equal(20);
 
@@ -180,7 +180,7 @@ describe('GET /api/v1.0/users/:column/reviews', function() {
                 _embed: 'movie.name,movie.rating',
                 _sort: 'id'
             }
-        }).should.be.fulfilled.then(function(response) {
+        }).then(function(response) {
             expect(response.status).to.be.equal(200);
             expect(response.data.length).to.be.equal(20);
 

@@ -79,7 +79,7 @@ describe('POST /api/v1.0/users/:column/reviews', function() {
                 reviewId = review.id;
 
                 response.headers.should.have.property('location')
-                    .that.is.equal(`http://127.0.0.1:${self.port}/api/v1.0/reviews/${reviewId}`);
+                    .that.is.equal(`http://127.0.0.1:${self.port}/api/v1.0/users/${self.userId}/reviews/${reviewId}`);
 
                 review.should.be.eql({
                     id: review.id,

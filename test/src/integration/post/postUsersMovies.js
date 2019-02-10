@@ -28,42 +28,42 @@ describe('POST /api/v1.0/users/:column/movies', function() {
         });
     });
 
-    //TODO should work when be-service route.gerUrl bug is fixed
-    it.skip('should create a new movie, associate it with the user and return correct Location header', function() {
+    it('should create a new movie, associate it with the user and return correct Location header', function() {
         const self = this;
         let movieId;
         let locationURI;
 
-        return this.Promise.delay(400).then(function() {
-            return self.sdk.postUsersMovies(self.userId, {data: {
-                name: 'movie',
-                description: 'movie-description',
-                released_at: '2018-01-01',
-                country_id: self.countryId
-            }});
-        }).then(function(response) {
-
+        return self.sdk.postUsersMovies(self.userId, {data: {
+            name: 'movie',
+            description: 'movie-description',
+            released_at: '2018-01-01',
+            country_id: self.countryId
+        }}).then(function(response) {
             locationURI = response.headers.location;
-
-            response.headers.should.have.property('location')
-                .that.is.equal(`http://127.0.0.1:${self.port}/api/v1.0/users/${self.userId}/movies/${movieId}`);
-
+            return self.Promise.delay(300);
+        }).then(function() {
             return self.knex('movies').where('name', 'movie').first();
         }).then(function(movie) {
             movieId = movie.id;
 
+            self.expect(locationURI)
+                .to.be.equal(`http://127.0.0.1:${self.port}/api/v1.0/users/${self.userId}/movies/${movieId}`);
+
+            movie.should.have.property('released_at').that.is.a.dateString();
+            delete movie.released_at;
+
             movie.should.be.eql({
                 id: movie.id,
                 name: 'movie',
                 country_id: self.countryId,
-                released_at: '2018-01-01',
+                rating: null,
                 description: 'movie-description',
             });
 
             return self.knex('movies_users').where('movie_id', movie.id).first();
         }).then(function(movieUser) {
 
-            movie.should.be.eql({
+            movieUser.should.be.eql({
                 id: movieUser.id,
                 movie_id: movieId,
                 user_id: self.userId
@@ -74,47 +74,47 @@ describe('POST /api/v1.0/users/:column/movies', function() {
                 url: locationURI
             });
         }).then(function(response) {
-            Object.keys(response.data).should.be.eql(['id', 'name', 'country_id','released_at', 'rating']);
+            Object.keys(response.data).should.be.eql(['id', 'name', 'released_at', 'country_id', 'rating']);
             self.expect(response.data.id).to.equal(movieId);
         });
     });
 
-    //TODO should work when be-service route.gerUrl bug is fixed
-    it.skip('should create a new movie, associate it with the user via username and return correct Location header', function() {
+    it('should create a new movie, associate it with the user via username and return correct Location header', function() {
         const self = this;
         let movieId;
         let locationURI;
 
-        return this.Promise.delay(400).then(function() {
-            return self.sdk.postUsersMovies('happiemovies', {data: {
-                name: 'movie2',
-                description: 'movie-description2',
-                released_at: '2018-01-02',
-                country_id: self.countryId
-            }});
-        }).then(function(response) {
-
+        return self.sdk.postUsersMovies('happiemovies', {data: {
+            name: 'movie2',
+            description: 'movie-description2',
+            released_at: '2018-01-02',
+            country_id: self.countryId
+        }}).then(function(response) {
             locationURI = response.headers.location;
-
-            response.headers.should.have.property('location')
-                .that.is.equal(`http://127.0.0.1:${self.port}/api/v1.0/users/${self.userId}/movies/${movieId}`);
-
+            return self.Promise.delay(300);
+        }).then(function() {
             return self.knex('movies').where('name', 'movie2').first();
         }).then(function(movie) {
             movieId = movie.id;
 
+            self.expect(locationURI)
+                .to.be.equal(`http://127.0.0.1:${self.port}/api/v1.0/users/${self.userId}/movies/${movieId}`);
+
+            movie.should.have.property('released_at').that.is.a.dateString();
+            delete movie.released_at;
+
             movie.should.be.eql({
                 id: movie.id,
-                name: 'movie',
+                name: 'movie2',
                 country_id: self.countryId,
-                released_at: '2018-01-01',
-                description: 'movie-description',
+                rating: null,
+                description: 'movie-description2',
             });
 
             return self.knex('movies_users').where('movie_id', movie.id).first();
         }).then(function(movieUser) {
 
-            movie.should.be.eql({
+            movieUser.should.be.eql({
                 id: movieUser.id,
                 movie_id: movieId,
                 user_id: self.userId
@@ -125,7 +125,7 @@ describe('POST /api/v1.0/users/:column/movies', function() {
                 url: locationURI
             });
         }).then(function(response) {
-            Object.keys(response.data).should.be.eql(['id', 'name', 'country_id','released_at', 'rating']);
+            Object.keys(response.data).should.be.eql(['id', 'name', 'released_at', 'country_id', 'rating']);
             self.expect(response.data.id).to.equal(movieId);
         });
     });

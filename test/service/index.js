@@ -96,8 +96,9 @@ function createEndpoints() {
 
     users.post('/'); //register new user
     users.post('/:{key}(\\d+)/@reviews'); //create new user review
-    users.post('/:{key}/@movies'); //create a new movie and associate it with the user
     users.post('/:username/@reviews'); //create new user review
+    users.post('/:{key}(\\d+)/@movies'); //create a new movie and associate it with the user
+    users.post('/:username/@movies'); //create a new movie and associate it with the user
 
     users.put('/:{key}'); //update user
     users.put('/:{key}/@movies/:{key}'); //assign a movie to the user
@@ -244,7 +245,7 @@ function createResources() {
 }
 
 /*
- * TODO remove this when the bug will be fixed in the upstream bi-service package
+ * TODO remove this when the bug is fixed in the upstream bi-service package
  */
 Service.ResourceManager.prototype.register = function(key, resource) {
 
@@ -256,4 +257,39 @@ Service.ResourceManager.prototype.register = function(key, resource) {
     this.resources[key] = resource;
     this.tag(key, key, '*');
     return resource;
+};
+
+/**
+ // TODO remove this when the bug is fixed in the upstream bi-service package
+ */
+Service.Route.prototype.getUrl = function getUrl(pathParams, queryParams) {
+
+    const qs = require('qs');
+    if (this.options.url instanceof RegExp) {
+        throw new RouteError(
+            'Not supported as the route endpoint includes regexp expression.'
+        );
+    }
+
+    //we need to normalize the url when Router's url is just '/'
+    var url = this.Router.$normalizeUrl(this.Router.getUrl() + this.options.url);
+
+    if (typeof pathParams === 'object' && pathParams !== null) {
+        Object.keys(pathParams).forEach(function(name) {
+            url = url.replace(`:${name}`, pathParams[name]);
+        });
+    }
+
+    //remove express-like regex matching part of url segment
+    // eg.: /path/:id(\d+) => /path/:id
+    url = url.replace(/\([^)]+\)/g, '');
+
+    if (   typeof queryParams === 'object'
+        && queryParams !== null
+        && Object.keys(queryParams).length
+    ) {
+        url = url + '?' + qs.stringify(queryParams);
+    }
+
+    return url;
 };
