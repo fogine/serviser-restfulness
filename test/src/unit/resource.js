@@ -107,7 +107,7 @@ describe('Resource', function() {
                 properties: {}
             });
 
-            resource.options.should.have.deep.property('db.table', 'user');
+            resource.options.should.have.deep.property('db.table', 'users');
         });
 
         it('should assign a reference of properties object to responseProperties when no responseProperties are defined', function() {
@@ -181,7 +181,7 @@ describe('Resource', function() {
                 plural: 'users',
                 properties: {}
             });
-            resource.getTableName().should.be.equal('user');
+            resource.getTableName().should.be.equal('users');
         });
 
         it('should return database table name (2)', function() {
