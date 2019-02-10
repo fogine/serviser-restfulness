@@ -204,7 +204,9 @@ describe('Resource', function() {
                 singular: 'user',
                 plural: 'users',
                 properties: {
-                    username: {type: 'string'},
+                    username: {type: 'string'}
+                },
+                responseProperties: {
                     address: {
                         type: 'object',
                         properties: {
@@ -238,6 +240,39 @@ describe('Resource', function() {
             this.expect(function() {
                 self.resource.prop('unknown');
             }).to.throw(Error, /no such property: unknown/);
+        });
+    });
+
+    describe('hasProp', function() {
+        before(function() {
+            this.resource = new this.Resource({
+                singular: 'user',
+                plural: 'users',
+                properties: {
+                    username: {type: 'string'},
+                },
+                responseProperties: {
+                    address: {
+                        type: 'object',
+                        properties: {
+                            country_code: {type: 'string'},
+                            city: {type: 'string'}
+                        }
+                    }
+                }
+            });
+        });
+
+        it('should return true when a property exists in `properties` object', function() {
+            this.resource.hasProp('username').should.be.equal(true);
+        });
+
+        it('should return true when a property exists in `responseProperties` despite it does not exist in `properties` object', function() {
+            this.resource.hasProp('address').should.be.equal(true);
+        });
+
+        it('should fireturn false when a resource does not have such property', function() {
+            this.resource.hasProp('unknown').should.be.equal(false);
         });
     });
 
@@ -627,39 +662,73 @@ describe('Resource', function() {
         describe('belongsToMany', function() {
             it('should create correct association at the source resource', function() {
                 this.resource1.belongsToMany(this.resource2);
+
+                const throughResource
+                    = this.resource1._associations.resources2.through.resource;
+
                 this.resource1._associations.should.have.property('resources2')
                 .that.is.eql({
                     type: 'MxM',
                     foreignKey: 'id',
                     localKey: 'key',
                     through: {
-                        resource: 'resources1_resources2',
+                        resource: throughResource,
                         foreignKey: 'resource2_id',
                         localKey: 'resource1_key'
                     }
+                });
+
+                throughResource.should.be.instanceof(this.Resource);
+                throughResource.getPluralName().should.be.equal('resources1_resources2');
+                throughResource.getName().should.be.equal('resource1_resource2');
+                throughResource.getResponseProperties().should.be.eql({
+                    resource1_key: {type: 'integer'},
+                    resource2_id: {type: 'integer'}
                 });
             });
 
             it('should create correct association at the target resource', function() {
                 this.resource1.belongsToMany(this.resource2);
+
+                const throughResource
+                    = this.resource1._associations.resources2.through.resource;
+
                 this.resource2._associations.should.have.property('resources1')
                 .that.is.eql({
                     type: 'MxM',
                     foreignKey: 'key',
                     localKey: 'id',
                     through: {
-                        resource: 'resources1_resources2',
+                        resource: throughResource,
                         foreignKey: 'resource1_key',
                         localKey: 'resource2_id'
                     }
                 });
+
+                throughResource.should.be.instanceof(this.Resource);
+                throughResource.getPluralName().should.be.equal('resources1_resources2');
+                throughResource.getName().should.be.equal('resource1_resource2');
+                throughResource.getResponseProperties().should.be.eql({
+                    resource1_key: {type: 'integer'},
+                    resource2_id: {type: 'integer'}
+                });
             });
 
-            it('should allow us to overwrite foreignKey & localKey defaults', function() {
+            it('should allow us to overwrite through pivot resource & foreignKey & localKey defaults', function() {
+                const throughResource = new this.Resource({
+                    plural: 'resources_resources2',
+                    singular: 'resource_resource2',
+                    properties: {
+                        resource2_uuid: {type: 'integer'},
+                        resource1_id: {type: 'integer'}
+                    }
+                });
+
                 this.resource1.belongsToMany(this.resource2, {
                     foreignKey: 'uuid', //resource2 column
                     localKey: 'id', //resource1 column
                     through: {
+                        resource: throughResource,
                         foreignKey: 'resource2_uuid',
                         localKey: 'resource1_id'
                     }
@@ -671,7 +740,7 @@ describe('Resource', function() {
                     foreignKey: 'uuid',
                     localKey: 'id',
                     through: {
-                        resource: 'resources1_resources2',
+                        resource: throughResource,
                         foreignKey: 'resource2_uuid',
                         localKey: 'resource1_id'
                     }
@@ -680,6 +749,8 @@ describe('Resource', function() {
 
             it('should be noop when the association has been already defined', function() {
                 this.resource1.belongsToMany(this.resource2);
+                const throughResource
+                    = this.resource1._associations.resources2.through.resource;
 
                 this.resource1._associations.should.have.property('resources2')
                 .that.is.eql({
@@ -687,7 +758,7 @@ describe('Resource', function() {
                     foreignKey: 'id',
                     localKey: 'key',
                     through: {
-                        resource: 'resources1_resources2',
+                        resource: throughResource,
                         foreignKey: 'resource2_id',
                         localKey: 'resource1_key'
                     }
