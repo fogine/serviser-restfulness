@@ -100,7 +100,8 @@ function createEndpoints() {
     users.post('/:{key}(\\d+)/@movies'); //create a new movie and associate it with the user
     users.post('/:username/@movies'); //create a new movie and associate it with the user
 
-    users.put('/:{key}'); //update user
+    users.put('/:{key}(\\d+)'); //update user
+    users.put('/:username'); //update user
     users.put('/:{key}/@movies/:{key}'); //assign a movie to the user
     users.put('/:{key}/@reviews/:{key}'); //update user review
 
@@ -175,9 +176,9 @@ function createResources() {
             code_2: {type: 'string', minLength: 2, maxLength: 2}
         },
         responseProperties: {
-            id: {type: 'integer'},
-            name: {type: 'string'},
-            code_2: {type: 'string'}
+            id: {type: 'integer', minimum: 1},
+            name: {$ref: 'country.name'},
+            code_2: {$ref: 'country.code_2'}
         }
     });
 
@@ -192,7 +193,7 @@ function createResources() {
             email: {type: 'string', format: 'email'}
         },
         responseProperties: {
-            id: {type: 'integer', maximum: 10000000},
+            id: {type: 'integer', minimum: 1, maximum: 10000000},
             username: {$ref: 'user.username'},
             subscribed: {$ref: 'user.subscribed'},
             created_at: {type: 'string'},
@@ -206,15 +207,15 @@ function createResources() {
         properties: {
             stars: {type: 'integer'},
             comment: {type: 'string', maxLength: 128},
-            movie_id: {type: 'integer', minimum: 1},
-            user_id: {type: 'integer', minimum: 1}
+            movie_id: {$ref: 'movie.id'},
+            user_id: {$ref: 'user.id'}
         },
         responseProperties: {
-            id: {type: 'integer'},
-            stars: {type: 'integer'},
-            comment: {type: 'string'},
-            movie_id: {type: 'integer'},
-            user_id: {type: 'integer'}
+            id: {type: 'integer', minimum: 1},
+            stars: {$ref: 'review.stars'},
+            comment: {$ref: 'review.comment'},
+            movie_id: {$ref: 'movie.id'},
+            user_id: {$ref: 'user.id'}
         }
     });
 
@@ -225,13 +226,13 @@ function createResources() {
             name: {type: 'string'},
             description: {type: 'string', maxLength: 256},
             released_at: {type: 'string', format: 'date'},
-            country_id: {type: 'integer', minimum: 1}
+            country_id: {$ref: 'country.id'}
         },
         responseProperties: {
-            id: {type: 'integer'},
-            name: {type: 'string'},
-            released_at: {type: 'string'},
-            country_id: {type: 'integer'},
+            id: {type: 'integer', minimum: 1},
+            name: {$ref: 'movie.name'},
+            released_at: {$ref: 'movie.released_at'},
+            country_id: {$ref: 'country.id'},
             rating: {type: 'number'},//calculated
         }
     });
