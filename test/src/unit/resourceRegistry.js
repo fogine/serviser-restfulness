@@ -80,4 +80,27 @@ describe('ResourceRegistry', function() {
             this.resourceRegistry.getBySingularName('human').should.be.equal(this.res);
         });
     });
+
+
+    describe('forEach', function() {
+        beforeEach(function() {
+            const res = new this.Resource({
+                singular: 'human',
+                plural: 'humans',
+                properties: {}
+            });
+
+            this.res = res;
+            this.resourceRegistry.add(res);
+        });
+
+        it('should iterate over all registered resources and provide the resource objects a parameter to the callback', function() {
+            const spy = this.sinon.spy();
+
+            this.resourceRegistry.forEach(spy);
+
+            spy.should.be.calledOnce;
+            spy.should.be.calledWith(this.res);
+        });
+    });
 });

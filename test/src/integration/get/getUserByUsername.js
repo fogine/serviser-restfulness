@@ -50,7 +50,7 @@ describe('GET /api/v1.0/users/:username', function() {
         return this.sdk.getUser('invalid+value').should.be.rejected.then(function(response) {
             expect(response.code).to.be.equal(400);
             expect(response.apiCode).to.be.equal('validationFailure');
-            expect(response.message).to.be.equal('.username should match pattern "^[a-z-_]+$"');
+            expect(response.message).to.be.equal('.username should match pattern "^[a-z0-9-_]+$"');
         });
     });
 });

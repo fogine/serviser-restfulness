@@ -412,6 +412,46 @@ describe('Resource', function() {
         });
     });
 
+    describe('_getCommonProperties', function() {
+        before(function() {
+            this.resource = new this.Resource({
+                singular: 'user',
+                plural: 'users',
+                properties: {
+                    password: {type: 'string'},
+                    email: {type: 'string', format: 'email'},
+                    id: {$ref: 'user.id'}
+                },
+                responseProperties: {
+                    username: {$ref: 'user.email'},
+                    password: {$ref: 'user.password'},
+                    created_at: {type: 'string', format: 'date-time'}
+                }
+            });
+        });
+
+        it('should return valid collection of common resource properties', function() {
+            let schema = this.resource._getCommonProperties();
+
+            this.expect(schema).to.be.eql([
+                {
+                    "$id": "user.password",
+                    type: "string"
+                },
+                {
+                    "$id": "user.email",
+                    format: "email",
+                    type: "string"
+                },
+                {
+                    "$id": "user.created_at",
+                    format: "date-time",
+                    type: "string"
+                }
+            ]);
+        });
+    });
+
 
     describe('associations', function() {
         beforeEach(function() {

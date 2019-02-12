@@ -186,15 +186,15 @@ function createResources() {
         plural: 'users',
         dynamicDefaults: {},
         properties: {
-            username: {type: 'string', minLength: 4, maxLength: 16, pattern: '^[a-z-_]+$'},
+            username: {type: 'string', minLength: 4, maxLength: 16, pattern: '^[a-z0-9-_]+$'},
             password: {type: 'string', maxLength: 32},
             subscribed: {type: 'boolean', default: false},
             email: {type: 'string', format: 'email'}
         },
         responseProperties: {
             id: {type: 'integer', maximum: 10000000},
-            username: {type: 'string'},
-            subscribed: {type: 'boolean'},
+            username: {$ref: 'user.username'},
+            subscribed: {$ref: 'user.subscribed'},
             created_at: {type: 'string'},
             updated_at: {type: 'string'}
         }

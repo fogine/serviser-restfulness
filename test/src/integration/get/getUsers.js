@@ -210,8 +210,7 @@ describe('GET /api/v1.0/users', function() {
         });
     });
 
-    it.skip('should return 400 json response with validation error when filter parameter value is invalid', function() {
-        //TODO
+    it('should return 400 json response with validation error when filter parameter value is invalid', function() {
         const self = this;
         const expect = this.expect;
         const userIds = this.userIds;
@@ -221,6 +220,7 @@ describe('GET /api/v1.0/users', function() {
         }}).should.be.rejected.then(function(response) {
             expect(response.code).to.be.equal(400);
             expect(response.apiCode).to.be.equal('validationFailure');
+            expect(response.message).to.match(/\.username/);
         });
     });
 });

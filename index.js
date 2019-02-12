@@ -9,6 +9,17 @@ const del = require('./lib/routes/del.js');
 
 const App = Service.App; //http app prototype
 
+//register resource property validation schemas
+Service.Service.on('set-up', function(appManager) {
+    appManager.on('build-app', function(app) {
+        const validator = app.getValidator();
+        Resource.registry.forEach(function(resource) {
+            validator.addSchema(resource._getCommonProperties());
+        });
+    });
+});
+
+
 /**
  * creates a router managed by restfulness
  * @param {Object} options

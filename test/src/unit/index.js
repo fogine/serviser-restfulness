@@ -28,6 +28,7 @@ describe('unit tests', function() {
     before(function() {
         this.expect = expect;
         this.chai = chai;
+        this.sinon = sinon;
         this._ = _;
 
         this.Resource = Resource;
