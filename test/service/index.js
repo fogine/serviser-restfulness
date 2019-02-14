@@ -105,8 +105,18 @@ function createEndpoints() {
     users.put('/:{key}/@movies/:{key}'); //assign a movie to the user
     users.put('/:{key}/@reviews/:{key}'); //update user review
 
-    users.del('/:{key}/@movies/:{key}'); //deassign a movie from the user
-    users.del('/:{key}/@reviews/:{key}'); //delete a user review
+    users.del('/'); //delete users
+    users.del('/:{key}(\\d+)'); //delete user
+    users.del('/:username'); //delete user
+    users.del('/:{key}(\\d+)/@movies/:{key}(\\d+)'); //deassign a movie from the user
+    users.del('/:username/@movies/:{key}(\\d+)'); //deassign a movie from the user
+    users.del('/:username/@movies/:name'); //deassign a movie from the user
+    users.del('/:{key}(\\d+)/@movies'); //deassign all movies from the user
+    users.del('/:username/@movies'); //deassign all movies from the user
+    users.del('/:{key}(\\d+)/@reviews/:{key}(\\d+)'); //delete a user review
+    users.del('/:username/@reviews/:movie_id'); //delete a user review
+    users.del('/:{key}(\\d+)/@reviews'); //delete all user reviews
+    users.del('/:username/@reviews'); //delete all user reviews
 
     movies.get('/');//get movies
     movies.get('/:{key}/@reviews');//get movie reviews
@@ -195,7 +205,8 @@ function createResources() {
         responseProperties: {
             id: {type: 'integer', minimum: 1, maximum: 10000000},
             username: {$ref: 'user.username'},
-            subscribed: {$ref: 'user.subscribed'},
+            //needs default to be set because of the delete /users tests
+            subscribed: {$ref: 'user.subscribed', default: true},
             created_at: {type: 'string'},
             updated_at: {type: 'string'}
         }
