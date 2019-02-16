@@ -50,22 +50,23 @@ Of cource, there is more to be familiarized with when defining REST operations u
     * [property json-schema references](#property-json-schema-references)
     * [associations](#associations)
     * [API](#api)
-        * [Resource.registry](#resrouce.registry)
-            * [Resource.registry.getByPluralName]()
-            * [Resource.registry.getBySingularName]()
-        * [Resource.prototype.getName()]()
-        * [Resource.prototype.getPluralName()]()
-        * [Resource.prototype.getTableName()]()
-        * [Resource.prototype.getKeyName()]()
-        * [Resource.prototype.prop()]()
-        * [Resource.prototype.hasProp()]()
-        * [Resource.prototype.belongsTo()]()
-        * [Resource.prototype.hasMany()]()
-        * [Resource.prototype.belongsToMany()]()
+        * [Resource.registry](#resrouceregistry)
+            * [Resource.registry.getByPluralName](resourceregistrygetbypluralname)
+            * [Resource.registry.getBySingularName](resourceregistrygetbysingularname)
+        * [Resource.prototype.getName()](resourceprototypegetname)
+        * [Resource.prototype.getPluralName()](resourceprototypegetpluralname)
+        * [Resource.prototype.getTableName()](resourceprototypegettablename)
+        * [Resource.prototype.getKeyName()](resourceprototypegetkeyname)
+        * [Resource.prototype.prop()](resourceprototypeprop)
+        * [Resource.prototype.hasProp()](resourceprototypehasprop)
+        * [Resource.prototype.belongsTo()](resourceprototypebelongstoresource-options)
+        * [Resource.prototype.hasMany()](resourceprototypehasmanyresource-options)
+        * [Resource.prototype.belongsToMany()](resourceprototypebelongstomanyresource-options)
 * [Route definition](#route-definition)
     * [list of supported REST operations](#list-of-supported-rest-operations)
-    * [customizing route response properties](#customizing-route-response-properties)
-    * [customizing route input properties](#customizing-route-input-properties)
+    * [customizing route](#customizing-route)
+        * [modifying response data](#response-properties)
+        * [modifying accepted input data](#input-data-validation)
     * [about authentication/restricting access](#about-authentication/restricting-access)
     * [request lifecycle events and implementing extra logic](#request-lifecycle-events-and-implementing-extra-logic)
 
@@ -210,7 +211,7 @@ Defines Many to Many association between `sourceResource.belongsToMany(targetRes
 
 #### spetial `_embed` query parameter
 
-Accepted by all GET routes. Eager loads associated One to One resources.  
+Accepted by all GET routes. Eager loads associated One to One resources (embedding collections is not supported).  
 Examples:  
 - `GET posts/1?_embed=user` - embeds whole user resource in the response - meaning embeds all properties defined as part of `responseProperties` user resource option
 - `GET posts/1?_embed=user.username,user.id` - embeds user username and id in the response
@@ -296,6 +297,107 @@ accepts the following filter parameters (by default, can be modified):
 ###### one to one
 - `GET @resource1/:{key}/@resource2/:{key}` - fetch resource2 which belongs to resource1 
 - `GET @resource1/:property/@resource2/:property` - fetch resource2 which belongs to resource1
+
+### customizing route
+
+```javascript
+    const user = new Resource({
+        singular: 'user',
+        plural: 'users',
+        properties: {
+            name: {type: 'string'},
+            username: {type: 'string'},
+            password: {type: 'string'},
+            email: {type: 'string'}
+        },
+        responseProperties: {
+            id: {type: 'integer'},
+            name: {$ref: 'user.name'},
+            username: {$ref: 'user.username'},
+        }
+    });
+
+    const users = app.buildRestfulRouter({
+        url: '/api/{version}/@users',
+        version: 1.0
+    });
+```
+
+`Router`'s `get` & `post` & `put` &  `del` methods all return an uninitialized `bi-service` [HttpRoute](https://lucid-services.github.io/bi-service/Route.html) object.  
+The user is given time to manualy initialize the route in the current event loop tick, that is
+to define validation rules for `headers` & `body` & `query` & `params` objects and/or response schema or even to implement or tweak
+the main route's logic.  
+`bi-service-restfulness` schedules initialization procedures that will execute on the next event loop tick and will set default behavior and rules
+where it's not been done by the user.
+
+```javascript
+users.get('/'); //returns Route object instance
+users.post('/'); //returns Route object instance
+users.put('/'); //returns Route object instance
+users.del('/'); //returns Route object instance
+```
+
+##### response properties
+
+```javascript
+users.get('/:{key}'); //get single user
+```
+
+the get user route, if not modified by the developer, returns `id` & `name` & `username` properties for every user.  
+Lets modify the route so that it returns just the user username:  
+
+```javascript
+users
+.get('/:{key}')
+.respondsWith({
+    type: 'object',
+    additionalProperties: false,//IMPORTANT!
+    properties: {
+        username: {$ref: 'user.username'}
+    }
+});
+```
+simple, right? You just define a custom `json-schema`.   
+That being said, by defining your cuctom response schema its entirely up to you what features will be enabled.  
+For example the above custom schema does not allow any associated resources to be embedded along.
+
+##### input data validation
+
+```javascript
+users.post('/'); //register new user
+```
+
+Again, the post users route, if not modified by the developer, accepts in its json payload all properties that are defined as part of user's resource `properties` constructor option.  
+
+In this case, the route accepts `name` & `username` & `password` & `email` properties.  
+Lets modify the route so that it accepts additional `password_confirmation` field:  
+
+```javascript
+users
+.post('/')
+.validate({
+    type: 'object',
+    additionalProperties: false,//IMPORTANT!
+    properties: {
+        name: {$ref: 'user.name'},
+        username: {$ref: 'user.username'},
+        password: {
+            $ref: 'user.password',
+            bcrypt: {saltLength: 8}
+        },
+        password_confirmation: {
+            const: {$data: '1/password'}
+        },
+        email: {$ref: 'user.email'}
+    }
+}, 'body');
+```
+In the custom payload validator schema above, we make sure `password_confirmation` field matches the `password` field.  
+
+There is one more thing we did and thats we applied our custom validation/sanitization keyword to the valid password field which will make sure the password gets transformed into a more secure hash.  
+For custom keyword definition see `ajv`'s [official documentation](https://github.com/epoberezkin/ajv/blob/master/CUSTOM.md).  
+You can then apply the keyword to a `ajv` validator instance on your `bi-sevice` [HttpApplication](https://lucid-services.github.io/bi-service/App.html#getValidator) object.
+
 
 Tests
 -------------------
