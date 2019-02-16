@@ -133,9 +133,9 @@ user.hasMany(post);
 post.belongsTo(user);
 ```
 
-See [Resource.prototype.belongsTo](#)  
-or/and [Resource.prototype.hasMany](#)  
-or/and [Resource.prototype.belongsToMany](#) respectivelly.
+See [Resource.prototype.belongsTo](#resourceprototypebelongstoresource-options)  
+or/and [Resource.prototype.hasMany](#resourceprototypehasmanyresource-options)  
+or/and [Resource.prototype.belongsToMany](#resourceprototypebelongstomanyresource-options) respectivelly.
 
 
 ### API
