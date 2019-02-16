@@ -9,6 +9,8 @@ const del = require('./lib/routes/del.js');
 
 const App = Service.App; //http app prototype
 
+module.exports.Resource = Resource;
+
 //register resource property validation schemas
 Service.Service.on('set-up', function(appManager) {
     appManager.on('build-app', function(app) {
