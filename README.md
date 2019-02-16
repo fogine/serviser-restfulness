@@ -226,7 +226,7 @@ Example:
 #### filtering results or reducing scope of delete queries
 
 Accepted by GET and DELETE routes that operate on a collection of resources.  
-Routes that supports it accepts query parameter filters which are named after targed resource's response properties.  
+Routes that support it accept query parameter filters which are named after targed resource's response properties.  
 Example resource:  
 ```javascript
     const user = new Resource({
