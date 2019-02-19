@@ -8,8 +8,9 @@ BEGIN;
         password VARCHAR(32),
         email VARCHAR(32),
         subscribed BOOLEAN DEFAULT false,
-        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        created_at DATETIME NOT NULL,
+        updated_at DATETIME NOT NULL,
+        deleted_at DATETIME,
         PRIMARY KEY (id),
         CONSTRAINT users__username__key UNIQUE(username),
         CONSTRAINT users__email__key UNIQUE(email)

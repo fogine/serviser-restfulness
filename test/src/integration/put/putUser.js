@@ -5,9 +5,13 @@ describe('PUT /api/v1.0/users/:column', function() {
             username: 'happie',
             password: 'secret',
             subscribed: false,
-            email: 'email@email.com'
+            email: 'email@email.com',
+            created_at: this.knex.raw('now()'),
+            updated_at: this.knex.raw('now()')
         }).returning('id').bind(this).then(function(result) {
             this.userId = result[0];
+
+            return this.Promise.delay(1000);//so day updated_at timestamp has different value
         });
     });
 
@@ -31,16 +35,18 @@ describe('PUT /api/v1.0/users/:column', function() {
                 const user = rows[0];
                 expect(user.password).to.be.equal('secret');
                 expect(user.email).to.be.equal('happie-updated@email.com');
+                expect(user.deleted_at).to.be.a.dateString();
 
                 delete user.password;
                 delete user.email;
+                delete user.deleted_at;
                 assertUpdatedUserEntity(user);
             });
 
             function assertUpdatedUserEntity(user) {
                 Object.keys(user).should.be.eql(['id','username', 'subscribed', 'created_at', 'updated_at']);
                 user.should.have.property('created_at').that.is.a.dateString();
-                user.should.have.property('updated_at').that.is.a.dateString();
+                user.should.have.property('updated_at').that.is.a.dateString().and.that.is.not.equal(user.created_at);
                 delete user.created_at;
                 delete user.updated_at;
 
@@ -70,16 +76,18 @@ describe('PUT /api/v1.0/users/:column', function() {
                 const user = rows[0];
                 expect(user.password).to.be.equal('secret');
                 expect(user.email).to.be.equal('happie-updated@email.com');
+                expect(user.deleted_at).to.be.a.dateString();
 
                 delete user.password;
                 delete user.email;
+                delete user.deleted_at;
                 assertUpdatedUserEntity(user);
             });
 
             function assertUpdatedUserEntity(user) {
                 Object.keys(user).should.be.eql(['id','username', 'subscribed', 'created_at', 'updated_at']);
                 user.should.have.property('created_at').that.is.a.dateString();
-                user.should.have.property('updated_at').that.is.a.dateString();
+                user.should.have.property('updated_at').that.is.a.dateString().and.that.is.not.equal(user.created_at);
                 delete user.created_at;
                 delete user.updated_at;
 
@@ -108,9 +116,11 @@ describe('PUT /api/v1.0/users/:column', function() {
                 const user = rows[0];
                 expect(user.password).to.be.equal('secret');
                 expect(user.email).to.be.equal('email@email.com');
+                expect(user.deleted_at).to.be.a.dateString();
 
                 delete user.password;
                 delete user.email;
+                delete user.deleted_at;
                 assertUpdatedUserEntity(user);
             });
 

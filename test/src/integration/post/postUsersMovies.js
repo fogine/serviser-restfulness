@@ -5,7 +5,9 @@ describe('POST /api/v1.0/users/:column/movies', function() {
             username: 'happiemovies',
             password: 'pwd',
             subscribed: false,
-            email: 'email@email.com'
+            email: 'email@email.com',
+            created_at: this.knex.raw('now()'),
+            updated_at: this.knex.raw('now()')
         }).returning('id').bind(this).then(function(result) {
             this.userId = result[0];
 

@@ -11,7 +11,9 @@ describe('GET /api/v1.0/users/:user_id/movies/:movie_id', function() {
                 username: 'happie',
                 password: 'secret',
                 subscribed: false,
-                email: 'email@email.com'
+                email: 'email@email.com',
+                created_at: this.knex.raw('now()'),
+                updated_at: this.knex.raw('now()')
             }).returning('id')
         }).then(function(result) {
             this.userId = result[0];
@@ -40,15 +42,34 @@ describe('GET /api/v1.0/users/:user_id/movies/:movie_id', function() {
             }).returning('id');
         }).then(function(result) {
             this.movieId2 = result[0];
+
+            return this.knex('users').insert({
+                username: 'happie2',
+                password: 'secret2',
+                subscribed: false,
+                email: 'email2@email.com',
+                created_at: this.knex.raw('now()'),
+                updated_at: this.knex.raw('now()'),
+                deleted_at: this.knex.raw('now()')
+            }).returning('id');
+        }).then(function(result) {
+            this.deletedUserId = result[0];
+
+            return this.knex('movies_users').insert({
+                movie_id: this.movieId2,
+                user_id: this.deletedUserId
+            }).returning('id');
+        }).then(function(result) {
+            this.movieUserId2 = result[0];
         });
     });
 
     after(function() {
-        return this.knex('movies_users').where({id: this.movieUserId})
+        return this.knex('movies_users').whereIn('id', [this.movieUserId, this.movieUserId2])
             .del().bind(this).then(function() {
                 return this.knex('movies').whereIn('id', [this.movieId, this.movieId2]).del();
             }).then(function() {
-                return this.knex('users').where({id: this.userId}).del();
+                return this.knex('users').whereIn('id', [this.userId, this.deletedUserId]).del();
             }).then(function() {
                 return this.knex('countries').where({id: this.countryId}).del();
             });
@@ -84,7 +105,7 @@ describe('GET /api/v1.0/users/:user_id/movies/:movie_id', function() {
         });
     });
 
-    it('should embed coutnry resource in the movie response', function() {
+    it('should embed country resource in the movie response', function() {
         const expect = this.expect;
         const userId = this.userId;
         const movieId = this.movieId;
@@ -111,6 +132,16 @@ describe('GET /api/v1.0/users/:user_id/movies/:movie_id', function() {
         const expect = this.expect;
 
         return this.sdk.getUsersMovie(this.userId, this.movieId2).should.be.rejected.then(function(response) {
+            expect(response.code).to.be.equal(400);
+            expect(response.apiCode).to.be.equal('movie.notFound');
+            expect(response.message).to.be.equal('movie not found');
+        });
+    });
+
+    it('should return 400 json response with movie.notFound api code when user association is soft deleted', function() {
+        const expect = this.expect;
+
+        return this.sdk.getUsersMovie(this.deletedUserId, this.movieId2).should.be.rejected.then(function(response) {
             expect(response.code).to.be.equal(400);
             expect(response.apiCode).to.be.equal('movie.notFound');
             expect(response.message).to.be.equal('movie not found');

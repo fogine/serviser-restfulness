@@ -5,7 +5,9 @@ describe('PUT /api/v1.0/users/:column/review/:column', function() {
             username: 'happie',
             password: 'secret',
             subscribed: false,
-            email: 'email@email.com'
+            email: 'email@email.com',
+            created_at: this.knex.raw('now()'),
+            updated_at: this.knex.raw('now()')
         }).returning('id').bind(this).then(function(result) {
             this.userId = result[0];
 
@@ -23,7 +25,9 @@ describe('PUT /api/v1.0/users/:column/review/:column', function() {
                 username: 'sad',
                 password: 'badpwd',
                 subscribed: true,
-                email: 'email2@email.com'
+                email: 'email2@email.com',
+                created_at: this.knex.raw('now()'),
+                updated_at: this.knex.raw('now()')
             }).returning('id');
         }).then(function(result) {
             this.userId2 = result[0];

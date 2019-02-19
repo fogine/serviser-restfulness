@@ -5,7 +5,9 @@ describe('DELETE /api/v1.0/users/:column/reviews', function() {
             username: 'happie',
             password: 'secret',
             subscribed: false,
-            email: 'email@email.com'
+            email: 'email@email.com',
+            created_at: this.knex.raw('now()'),
+            updated_at: this.knex.raw('now()')
         }).returning('id').bind(this).then(function(result) {
             this.userId = result[0];
 

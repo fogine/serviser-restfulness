@@ -5,7 +5,9 @@ describe('GET /api/v1.0/users/:column/reviews', function() {
             username: 'happie',
             password: 'secret',
             subscribed: false,
-            email: 'email@email.com'
+            email: 'email@email.com',
+            created_at: this.knex.raw('now()'),
+            updated_at: this.knex.raw('now()')
         }).returning('id').bind(this).then(function(result) {
             this.userId = result[0];
 
@@ -40,19 +42,31 @@ describe('GET /api/v1.0/users/:column/reviews', function() {
                 username: 'happie22',
                 password: 'secret2',
                 subscribed: false,
-                email: 'email2@email.com'
+                email: 'email2@email.com',
+                created_at: this.knex.raw('now()'),
+                updated_at: this.knex.raw('now()'),
+                deleted_at: this.knex.raw('now()')
             }).returning('id');
         }).then(function(result) {
-            this.userId2 = result[0];
+            this.deletedUserId = result[0];
+
+            return this.knex('reviews').insert({
+                stars: 8,
+                comment: 'comment',
+                movie_id: this.movieIds[0],
+                user_id: this.deletedUserId
+            }).returning('id');
+        }).then(function(result) {
+            this.deletedUserReviewId = result[0];
         });
     });
 
     after(function() {
-        return this.knex('reviews').whereIn('id', this.reviewIds)
+        return this.knex('reviews').whereIn('id', this.reviewIds.concat([this.deletedUserReviewId]))
             .del().bind(this).then(function() {
                 return this.knex('movies').whereIn('id', this.movieIds).del();
             }).then(function() {
-                return this.knex('users').whereIn('id', [this.userId, this.userId2]).del();
+                return this.knex('users').whereIn('id', [this.userId, this.deletedUserId]).del();
             });
     });
 
@@ -106,7 +120,7 @@ describe('GET /api/v1.0/users/:column/reviews', function() {
         });
     });
 
-    it('should return collection of users` movies which match defined query filter parameters', function() {
+    it('should return collection of users` reviews which match defined query filter parameters', function() {
         const expect = this.expect;
         const userId = this.userId;
         const movieIds = this.movieIds;
@@ -198,6 +212,15 @@ describe('GET /api/v1.0/users/:column/reviews', function() {
                     rating: 10
                 });
             });
+        });
+    });
+
+    it('should return empty collection when quering soft deleted resource', function() {
+        const expect = this.expect;
+        const userId = this.deletedUserId;
+
+        return this.sdk.getUsersReviews(userId).then(function(response) {
+            expect(response.data.length).to.be.equal(0);
         });
     });
 

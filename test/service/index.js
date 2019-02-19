@@ -92,7 +92,8 @@ function createEndpoints() {
     users.get('/:username/@movies/:name'); //get user movie
     users.get('/:{key}(\\d+)/@reviews/'); //get user reviews
     users.get('/:username/@reviews/'); //get user reviews
-    users.get('/:{key}/@reviews/:{key}'); //get user review
+    users.get('/:{key}(\\d+)/@reviews/:{key}'); //get user review
+    users.get('/:username/@reviews/:{key}'); //get user review
 
     users.post('/'); //register new user
     users.post('/:{key}(\\d+)/@reviews'); //create new user review
@@ -196,6 +197,8 @@ function createResources() {
         singular: 'user',
         plural: 'users',
         dynamicDefaults: {},
+        timestamps: true,
+        softDelete: true,
         properties: {
             username: {type: 'string', minLength: 4, maxLength: 16, pattern: '^[a-z0-9-_]+$'},
             password: {type: 'string', maxLength: 32},

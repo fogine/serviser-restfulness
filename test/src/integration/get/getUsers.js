@@ -3,39 +3,31 @@ describe('GET /api/v1.0/users', function() {
     before(function() {
         const rows = [];
 
-        for (let i = 0, len = 20; i < len; i++) {
+        for (let i = 0, len = 21; i < len; i++) {
             rows.push({
                 username: `happie${i+1}`,
                 password: `secret${i+1}`,
                 subscribed: false,
-                email: `email${i+1}@email.com`
+                email: `email${i+1}@email.com`,
+                created_at: this.knex.raw('now()'),
+                updated_at: this.knex.raw('now()')
             });
         }
 
-        return this.knex.batchInsert('users', rows, 20)
+        rows[20].deleted_at = this.knex.raw('now()');
+
+        return this.knex.batchInsert('users', rows, 21)
             .returning('id')
             .bind(this)
             .then(function(ids) {
-                this.userIds = ids;
-
-                if (this.userIds.length == 1) {
-                    /*
-                     * If you insert multiple rows using a single INSERT statement,
-                     * LAST_INSERT_ID() returns the value generated for the first inserted row only.
-                     * The reason for this is to make it possible to reproduce
-                     * easily the same INSERT statement against some other server.
-                     * https://github.com/tgriesser/knex/issues/86
-                     */
-                    for (let i = this.userIds[0]+1, len = this.userIds[0]+20; i < len; i++) {
-                        this.userIds.push(i);
-                    }
-                }
+                this.userIds = this.utils.expandResourceIds(ids, 21);
+                this.deletedUserId = this.userIds.pop();
             });
 
     });
 
     after(function() {
-        return this.knex('users').whereIn('id', this.userIds).del();
+        return this.knex('users').whereIn('id', this.userIds.concat([this.deletedUserId])).del();
     });
 
     it('should return (200 code) collection of all user resources', function() {

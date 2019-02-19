@@ -5,7 +5,9 @@ describe('GET /api/v1.0/users/:column/movies', function() {
             username: 'happie',
             password: 'secret',
             subscribed: false,
-            email: 'email@email.com'
+            email: 'email@email.com',
+            created_at: this.knex.raw('now()'),
+            updated_at: this.knex.raw('now()')
         }).returning('id').bind(this).then(function(result) {
             this.userId = result[0];
 
@@ -42,12 +44,36 @@ describe('GET /api/v1.0/users/:column/movies', function() {
             return this.knex.batchInsert('movies_users', moviesUsersRows, 20).returning('id');
         }).bind(this).then(function(ids) {
             this.moviesUsersIds = this.utils.expandResourceIds(ids, 20);
+
+            return this.knex('users').insert({
+                username: 'happie22',
+                password: 'secret2',
+                subscribed: false,
+                email: 'email222@email.com',
+                created_at: this.knex.raw('now()'),
+                updated_at: this.knex.raw('now()'),
+                deleted_at: this.knex.raw('now()')
+            }).returning('id');
+        }).then(function(result) {
+            this.deletedUserId = result[0];
+
+            return this.knex('movies_users').insert({
+                movie_id: this.movieIds[0],
+                user_id: this.deletedUserId
+            }).returning('id');
+        }).then(function(result) {
+            this.moviesUsersId = result[0];
         });
     });
 
     after(function() {
         const self = this;
-        let ids = [this.moviesUsersIds, this.userId, this.movieIds, this.countryId];
+        let ids = [
+            this.moviesUsersIds.concat([this.moviesUsersId]),
+            [this.userId, this.deletedUserId],
+            this.movieIds,
+            this.countryId
+        ];
 
         return this.Promise.each(['movies_users', 'users', 'movies', 'countries'], function(table, index) {
             const delQuery = self.knex(table);
@@ -196,6 +222,15 @@ describe('GET /api/v1.0/users/:column/movies', function() {
                     code_2: 'US'
                 });
             });
+        });
+    });
+
+    it('should return empty collection when requesting movies of soft deleted user resource', function() {
+        const expect = this.expect;
+        const userId = this.deletedUserId;
+
+        return this.sdk.getUsersMovies(userId).then(function(response) {
+            expect(response.data.length).to.be.equal(0);
         });
     });
 

@@ -40,7 +40,7 @@ The following is a simplest example of what it takes to design basic REST API op
     movies.del('/');//delete movies
 ```
 
-With assumption that you were to use `bi-service-doc` plugin, you'd get [THIS generated API documentation]() of above defined endpoints.  
+With assumption that you were to use `bi-service-doc` plugin, you'd get [THIS generated API documentation](https://fogine.github.io/bi-service-restfulness-documentation-example) of above defined endpoints.  
 On the other hand if you were to plug in `bi-service-sdk` you would get client API SDKs for free.  
 
 Of cource, there is more to be familiarized with when defining REST operations using `bi-service-restfulness`:  
@@ -226,7 +226,7 @@ Example:
 #### filtering results or reducing scope of delete queries
 
 Accepted by GET and DELETE routes that operate on a collection of resources.  
-Routes that support it accept query parameter filters which are named after targed resource's response properties.  
+Routes that support it, accept query parameter filters which are named after targed resource's response properties.  
 Example resource:  
 ```javascript
     const user = new Resource({
@@ -236,7 +236,7 @@ Example resource:
             password: {type: 'string'},
             email: {type: 'string'}
         },
-        responseProperties: {
+        responseProperties: {//but can be filtered/reduced by there
             id: {type: 'integer'},
             username: {type: 'string'}
         }

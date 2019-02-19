@@ -32,7 +32,8 @@ describe('POST /api/v1.0/users', function() {
                     username: 'happie',
                     password: 'verysecretpassword',
                     subscribed: true,
-                    email: 'happie@email.com'
+                    email: 'happie@email.com',
+                    deleted_at: null
                 });
 
                 return sdk.$request({

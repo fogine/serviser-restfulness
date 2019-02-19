@@ -5,7 +5,9 @@ describe('GET /api/v1.0/users/:user_id/reviews/:review_id', function() {
             username: 'happie',
             password: 'secret',
             subscribed: false,
-            email: 'email@email.com'
+            email: 'email@email.com',
+            created_at: this.knex.raw('now()'),
+            updated_at: this.knex.raw('now()')
         }).returning('id').bind(this).then(function(result) {
             this.userId = result[0];
 
@@ -31,29 +33,69 @@ describe('GET /api/v1.0/users/:user_id/reviews/:review_id', function() {
                 username: 'happie22',
                 password: 'secret2',
                 subscribed: false,
-                email: 'email2@email.com'
+                email: 'email2@email.com',
+                created_at: this.knex.raw('now()'),
+                updated_at: this.knex.raw('now()')
             }).returning('id');
         }).then(function(result) {
-            this.userId2 = result[0];
+            this.userWithoutReviewId = result[0];
+
+            return this.knex('users').insert({
+                username: 'happie33',
+                password: 'secret3',
+                subscribed: false,
+                email: 'email3@email.com',
+                created_at: this.knex.raw('now()'),
+                updated_at: this.knex.raw('now()'),
+                deleted_at: this.knex.raw('now()')
+            }).returning('id');
+        }).then(function(result) {
+            this.deletedUserId = result[0];
+
+            return this.knex('reviews').insert({
+                stars: 10,
+                comment: 'comment',
+                movie_id: this.movieId,
+                user_id: this.deletedUserId
+            }).returning('id');
+        }).then(function(result) {
+            this.reviewId2 = result[0];
         });
     });
 
     after(function() {
-        return this.knex('reviews').where({id: this.reviewId})
+        return this.knex('reviews').whereIn('id', [this.reviewId, this.reviewId2])
             .del().bind(this).then(function() {
                 return this.knex('movies').whereIn('id', [this.movieId]).del();
             }).then(function() {
-                return this.knex('users').whereIn('id', [this.userId, this.userId2]).del();
+                return this.knex('users').whereIn('id', [this.userId, this.userWithoutReviewId, this.deletedUserId]).del();
             });
     });
 
-    it('should return 200 json response with user details', function() {
+    it('should fetch users review resource by user id', function() {
         const expect = this.expect;
         const userId = this.userId;
         const reviewId = this.reviewId;
         const movieId = this.movieId;
 
-        return this.sdk.getUsersReview(userId, reviewId).should.be.fulfilled.then(function(response) {
+        return this.sdk.getUsersReview(userId, reviewId).then(function(response) {
+            Object.keys(response.data).should.be.eql(['id', 'stars', 'comment', 'movie_id', 'user_id']);
+
+            expect(response.data.id).to.equal(reviewId);
+            expect(response.data.comment).to.equal('comment');
+            expect(response.data.stars).to.equal(10);
+            expect(response.data.movie_id).to.equal(movieId);
+            expect(response.data.user_id).to.equal(userId);
+        });
+    });
+
+    it('should fetch users review resource by user username', function() {
+        const expect = this.expect;
+        const userId = this.userId;
+        const reviewId = this.reviewId;
+        const movieId = this.movieId;
+
+        return this.sdk.getUsersReview('happie', reviewId).then(function(response) {
             Object.keys(response.data).should.be.eql(['id', 'stars', 'comment', 'movie_id', 'user_id']);
 
             expect(response.data.id).to.equal(reviewId);
@@ -72,7 +114,7 @@ describe('GET /api/v1.0/users/:user_id/reviews/:review_id', function() {
 
         return this.sdk.getUsersReview(userId, reviewId, {
             query: {_embed: 'movie,user'}
-        }).should.be.fulfilled.then(function(response) {
+        }).then(function(response) {
             Object.keys(response.data).should.be.eql(['id', 'stars', 'comment', 'movie_id', 'user_id', 'movie', 'user']);
 
             expect(response.data.id).to.equal(reviewId);
@@ -107,7 +149,17 @@ describe('GET /api/v1.0/users/:user_id/reviews/:review_id', function() {
     it('should return 400 json response with review.notFound api code when association does NOT exist', function() {
         const expect = this.expect;
 
-        return this.sdk.getUsersReview(this.userId2, this.reviewId).should.be.rejected.then(function(response) {
+        return this.sdk.getUsersReview(this.userWithoutReviewId, this.reviewId).should.be.rejected.then(function(response) {
+            expect(response.code).to.be.equal(400);
+            expect(response.apiCode).to.be.equal('review.notFound');
+            expect(response.message).to.be.equal('review not found');
+        });
+    });
+
+    it('should return 400 json response with review.notFound api code when requesting review of soft deleted user resource', function() {
+        const expect = this.expect;
+
+        return this.sdk.getUsersReview(this.deletedUserId, this.reviewId2).should.be.rejected.then(function(response) {
             expect(response.code).to.be.equal(400);
             expect(response.apiCode).to.be.equal('review.notFound');
             expect(response.message).to.be.equal('review not found');

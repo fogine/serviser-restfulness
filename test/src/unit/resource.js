@@ -134,6 +134,51 @@ describe('Resource', function() {
 
             this.Resource.registry.getByPluralName('users').should.be.equal(resource);
         });
+
+        describe('timestamps & softDelete options', function() {
+            it('should assign default value for timestamps option', function() {
+                let resource = new this.Resource({
+                    singular: 'user',
+                    plural: 'users',
+                    properties: {}
+                });
+
+                resource.options.should.have.property('timestamps', false);
+            });
+
+            it('should set timestamps option to true', function() {
+                let resource = new this.Resource({
+                    singular: 'user',
+                    plural: 'users',
+                    timestamps: true,
+                    properties: {}
+                });
+
+                resource.options.should.have.property('timestamps', true);
+            });
+
+            it('should assign default value for selfDelete option', function() {
+                let resource = new this.Resource({
+                    singular: 'user',
+                    plural: 'users',
+                    properties: {}
+                });
+
+                resource.options.should.have.property('softDelete', false);
+            });
+
+            it('should assign default value for CREATED_AT & UPDATED_AT & DELETED_AT options', function() {
+                let resource = new this.Resource({
+                    singular: 'user',
+                    plural: 'users',
+                    properties: {}
+                });
+
+                resource.options.should.have.property('CREATED_AT', 'created_at');
+                resource.options.should.have.property('UPDATED_AT', 'updated_at');
+                resource.options.should.have.property('DELETED_AT', 'deleted_at');
+            });
+        });
     });
 
     describe('getName', function() {
@@ -273,6 +318,55 @@ describe('Resource', function() {
 
         it('should fireturn false when a resource does not have such property', function() {
             this.resource.hasProp('unknown').should.be.equal(false);
+        });
+    });
+
+    describe('hasTimestamps', function() {
+        it('should return true when resource has timestamps option set', function() {
+
+            let resource = new this.Resource({
+                singular: 'user',
+                plural: 'users',
+                timestamps: true,
+                properties: {},
+            });
+
+            resource.hasTimestamps().should.be.equal(true);
+        });
+
+        it('should return false when resource does not have timestamps option set', function() {
+
+            let resource = new this.Resource({
+                singular: 'user',
+                plural: 'users',
+                timestamps: false,
+                properties: {},
+            });
+
+            resource.hasTimestamps().should.be.equal(false);
+        });
+
+        it('should return true when resource can be soft deleted', function() {
+
+            let resource = new this.Resource({
+                singular: 'user',
+                plural: 'users',
+                softDelete: true,
+                properties: {},
+            });
+
+            resource.hasTimestamps(resource.DELETED_AT).should.be.equal(true);
+        });
+
+        it('should return false when resource can NOT be soft deleted', function() {
+
+            let resource = new this.Resource({
+                singular: 'user',
+                plural: 'users',
+                properties: {},
+            });
+
+            resource.hasTimestamps(resource.DELETED_AT).should.be.equal(false);
         });
     });
 

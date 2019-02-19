@@ -5,7 +5,9 @@ describe('DELETE /api/v1.0/users', function() {
             username: 'happie',
             password: 'secret',
             subscribed: true,
-            email: 'email@email.com'
+            email: 'email@email.com',
+            created_at: this.knex.raw('now()'),
+            updated_at: this.knex.raw('now()')
         }).returning('id').bind(this).then(function(result) {
             this.userId = result[0];
 
@@ -13,7 +15,9 @@ describe('DELETE /api/v1.0/users', function() {
                 username: 'happie2',
                 password: 'secret2',
                 subscribed: true,
-                email: 'email2@email.com'
+                email: 'email2@email.com',
+                created_at: this.knex.raw('now()'),
+                updated_at: this.knex.raw('now()')
             }).returning('id');
         }).then(function(result) {
             this.userId2 = result[0];
@@ -22,7 +26,9 @@ describe('DELETE /api/v1.0/users', function() {
                 username: 'happie3',
                 password: 'secret3',
                 subscribed: false,
-                email: 'email3@email.com'
+                email: 'email3@email.com',
+                created_at: this.knex.raw('now()'),
+                updated_at: this.knex.raw('now()')
             }).returning('id');
         }).then(function(result) {
             this.userId3 = result[0];
@@ -33,7 +39,7 @@ describe('DELETE /api/v1.0/users', function() {
         return this.knex('users').del();
     });
 
-    it('should delete user resource by id and return 204 with correct x-total-count header value', function() {
+    it('should soft-delete user resource by id and return 204 with correct x-total-count header value', function() {
         const expect = this.expect;
         const knex = this.knex;
         const userId = this.userId;
@@ -46,13 +52,13 @@ describe('DELETE /api/v1.0/users', function() {
             expect(response.status).to.be.equal(204);
             expect(response.headers['x-total-count']).to.be.equal('1');
 
-            return knex('users').where('id', userId).first();
+            return knex('users').where('id', userId).where('deleted_at', null).first();
         }).then(function(user) {
             expect(user).to.be.equal(undefined);
         });
     });
 
-    it('should delete all subscribed and return 204 with correct x-total-count header value', function() {
+    it('should soft-delete all subscribed and return 204 with correct x-total-count header value', function() {
         const expect = this.expect;
         const knex = this.knex;
         const userId = this.userId3;
@@ -65,14 +71,14 @@ describe('DELETE /api/v1.0/users', function() {
             expect(response.status).to.be.equal(204);
             expect(response.headers['x-total-count']).to.be.equal('2');
 
-            return knex('users').where('id', userId).first();
+            return knex('users').where('id', userId).where('deleted_at', null).first();
         }).then(function(user) {
             expect(user).to.be.a('object');
             expect(user.id).to.be.equal(userId);
         });
     });
 
-    it('should delete all user resources', function() {
+    it('should soft-delete all user resources', function() {
         const expect = this.expect;
         const knex = this.knex;
 
@@ -80,7 +86,7 @@ describe('DELETE /api/v1.0/users', function() {
             expect(response.status).to.be.equal(204);
             expect(response.headers['x-total-count']).to.be.equal('3');
 
-            return knex('users').select();
+            return knex('users').select().where('deleted_at', null);
         }).then(function(rows) {
             expect(rows).to.be.an('array').that.is.empty;
         });

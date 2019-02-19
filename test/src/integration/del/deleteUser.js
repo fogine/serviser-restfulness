@@ -5,7 +5,9 @@ describe('DELETE /api/v1.0/users/:column', function() {
             username: 'happie',
             password: 'secret',
             subscribed: false,
-            email: 'email@email.com'
+            email: 'email@email.com',
+            created_at: this.knex.raw('now()'),
+            updated_at: this.knex.raw('now()')
         }).returning('id').bind(this).then(function(result) {
             this.userId = result[0];
 
@@ -13,7 +15,9 @@ describe('DELETE /api/v1.0/users/:column', function() {
                 username: 'happie2',
                 password: 'secret2',
                 subscribed: true,
-                email: 'email2@email.com'
+                email: 'email2@email.com',
+                created_at: this.knex.raw('now()'),
+                updated_at: this.knex.raw('now()')
             }).returning('id');
         }).then(function(result) {
             this.userId2 = result[0];
@@ -24,7 +28,7 @@ describe('DELETE /api/v1.0/users/:column', function() {
         return this.knex('users').del();
     });
 
-    it('should delete user resource by id and return 204', function() {
+    it('should soft-delete user resource by id and return 204', function() {
         const expect = this.expect;
         const knex = this.knex;
         const userId = this.userId;
@@ -32,13 +36,13 @@ describe('DELETE /api/v1.0/users/:column', function() {
         return this.sdk.deleteUser(this.userId).then(function(response) {
             expect(response.status).to.be.equal(204);
 
-            return knex('users').where('id', userId).first();
+            return knex('users').where('id', userId).where('deleted_at', null).first();
         }).then(function(user) {
             expect(user).to.be.equal(undefined);
         });
     });
 
-    it('should delete user resource by username and return 204', function() {
+    it('should soft-delete user resource by username and return 204', function() {
         const expect = this.expect;
         const knex = this.knex;
         const userId = this.userId2;
@@ -46,7 +50,7 @@ describe('DELETE /api/v1.0/users/:column', function() {
         return this.sdk.deleteUser('happie2').then(function(response) {
             expect(response.status).to.be.equal(204);
 
-            return knex('users').where('id', userId).first();
+            return knex('users').where('id', userId).where('deleted_at', null).first();
         }).then(function(user) {
             expect(user).to.be.equal(undefined);
         });
