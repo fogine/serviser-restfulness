@@ -85,9 +85,14 @@ Resources are compound data structures describing a data source and how it relat
         - `type` - _required_, _default_:`integer` enum: [`integer`, `string`]
         - `format` - _optional_ `ajv` string format
         - `pattern` - _optional_ `ajv` string regex
+- `timestamps` - _optional_, _default_ false, sets `created_at` & `updated_at` timestamps every time the resource is created/updated
+- `softDelete` - _optional_, _default_ false, DELETE methods set `deleted_at` timestamp instead of permanently removing the record
 - `properties` - _required_, `ajv-json-schema` object properties descriptor, lists allowed input properties for REST operations
 - `responseProperties` - _optional_, `ajv-json-schema` object properties descriptor, lists allowed query and response properties, if NOT defined, ALL `properties` will be whitelisted
 - `dynamicDefaults` - _optional_, `ajv` [dynamic defaults](https://github.com/epoberezkin/ajv-keywords#dynamicdefaults) definition object for properties listed in `properties` option object
+- `CREATED_AT` - _optional_, _default_ `created_at` allows to customize timestamp property name
+- `UPDATED_AT` - _optional_, _default_ `updated_at` allows to customize timestamp property name
+- `DELETED_AT` - _optional_, _default_ `deleted_at` allows to customize timestamp property name
 
 ### property json-schema references
 

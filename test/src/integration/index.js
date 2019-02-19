@@ -61,7 +61,7 @@ describe('integration tests', function() {
         const self = this;
 
         this.service = require('../../service/index.js')(dbProvider, port);
-        this.knex = this.service.knex;
+        this.knex = this.service.resourceManager.get('knex');
 
         return this.service.listen().then(function() {
             const app = self.service.appManager.get('test');

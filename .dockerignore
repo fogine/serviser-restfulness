@@ -1,0 +1,12 @@
+.git
+.idea
+.vscode
+config/*
+!config/template/*
+logs
+node_modules
+*.vim
+*.zip
+.tern-project
+sqitch.conf
+npm-debug.log

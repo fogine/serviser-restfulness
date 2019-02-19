@@ -33,12 +33,10 @@ function createService(dbProvider, port) {
 
     createResources();
 
-    //TODO fix bug in bi-service-knex inspectIntegrity method
-    //service.resourceManager.register(
-        //'knex',
-        //Knex(getDbConnectionOptions(dbProvider))
-    //);
-    service.knex = Knex(getDbConnectionOptions(dbProvider));
+    service.resourceManager.register(
+        'knex',
+        Knex(getDbConnectionOptions(dbProvider))
+    );
 
     service.on('set-up', createEndpoints);
 
@@ -258,53 +256,3 @@ function createResources() {
     review.belongsTo(user);
     review.belongsTo(movie);
 }
-
-/*
- * TODO remove this when the bug is fixed in the upstream bi-service package
- */
-Service.ResourceManager.prototype.register = function(key, resource) {
-
-    if (typeof resource.inspectIntegrity !== 'function'
-    ) {
-        throw new TypeError('The resource must be an object that implements `inspectIntegrity` method');
-    }
-
-    this.resources[key] = resource;
-    this.tag(key, key, '*');
-    return resource;
-};
-
-/**
- // TODO remove this when the bug is fixed in the upstream bi-service package
- */
-Service.Route.prototype.getUrl = function getUrl(pathParams, queryParams) {
-
-    const qs = require('qs');
-    if (this.options.url instanceof RegExp) {
-        throw new RouteError(
-            'Not supported as the route endpoint includes regexp expression.'
-        );
-    }
-
-    //we need to normalize the url when Router's url is just '/'
-    var url = this.Router.$normalizeUrl(this.Router.getUrl() + this.options.url);
-
-    if (typeof pathParams === 'object' && pathParams !== null) {
-        Object.keys(pathParams).forEach(function(name) {
-            url = url.replace(`:${name}`, pathParams[name]);
-        });
-    }
-
-    //remove express-like regex matching part of url segment
-    // eg.: /path/:id(\d+) => /path/:id
-    url = url.replace(/\([^)]+\)/g, '');
-
-    if (   typeof queryParams === 'object'
-        && queryParams !== null
-        && Object.keys(queryParams).length
-    ) {
-        url = url + '?' + qs.stringify(queryParams);
-    }
-
-    return url;
-};

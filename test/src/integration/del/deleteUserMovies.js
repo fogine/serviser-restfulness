@@ -79,7 +79,7 @@ describe('DELETE /api/v1.0/users/:column/movies', function() {
         });
     });
 
-    it.only('should deassociate all movies from the user by user username and return 204 with correct x-total-count header', function() {
+    it('should deassociate all movies from the user by user username and return 204 with correct x-total-count header', function() {
         const self = this;
 
         return this.sdk.deleteUsersMovies('happie').then(function(response) {

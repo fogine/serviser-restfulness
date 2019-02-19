@@ -77,13 +77,13 @@ describe('GET /api/v1.0/users', function() {
                     offset: '10',
                     limit: '5',
                     rel: 'next',
-                    url: `http://127.0.0.1:${self.port}/api/v1.0/users?offset=10&limit=5`
+                    url: `http://127.0.0.1:${self.port}/api/v1.0/users?limit=5&offset=10`
                 },
                 prev: {
                     offset: '0',
                     limit: '5',
                     rel: 'prev',
-                    url: `http://127.0.0.1:${self.port}/api/v1.0/users?offset=0&limit=5`
+                    url: `http://127.0.0.1:${self.port}/api/v1.0/users?limit=5&offset=0`
                 }
             });
 
