@@ -63,27 +63,27 @@ describe('GET /api/v1.0/users', function() {
             const link = self.parseLinkHeader(response.headers.link);
             link.should.be.eql({
                 first: {
-                    limit: '5',
+                    _limit: '5',
                     rel: 'first',
-                    url: `http://127.0.0.1:${self.port}/api/v1.0/users?limit=5`
+                    url: `http://127.0.0.1:${self.port}/api/v1.0/users?_limit=5`
                 },
                 last: {
-                    limit: '5',
-                    offset: '15',
+                    _limit: '5',
+                    _offset: '15',
                     rel: 'last',
-                    url: `http://127.0.0.1:${self.port}/api/v1.0/users?limit=5&offset=15`
+                    url: `http://127.0.0.1:${self.port}/api/v1.0/users?_limit=5&_offset=15`
                 },
                 next: {
-                    offset: '10',
-                    limit: '5',
+                    _offset: '10',
+                    _limit: '5',
                     rel: 'next',
-                    url: `http://127.0.0.1:${self.port}/api/v1.0/users?limit=5&offset=10`
+                    url: `http://127.0.0.1:${self.port}/api/v1.0/users?_limit=5&_offset=10`
                 },
                 prev: {
-                    offset: '0',
-                    limit: '5',
+                    _offset: '0',
+                    _limit: '5',
                     rel: 'prev',
-                    url: `http://127.0.0.1:${self.port}/api/v1.0/users?limit=5&offset=0`
+                    url: `http://127.0.0.1:${self.port}/api/v1.0/users?_limit=5&_offset=0`
                 }
             });
 
@@ -154,9 +154,9 @@ describe('GET /api/v1.0/users', function() {
                     url: `http://127.0.0.1:${self.port}/api/v1.0/users`
                 },
                 last: {
-                    offset: '0',
+                    _offset: '0',
                     rel: 'last',
-                    url: `http://127.0.0.1:${self.port}/api/v1.0/users?offset=0`
+                    url: `http://127.0.0.1:${self.port}/api/v1.0/users?_offset=0`
                 }
             });
 
