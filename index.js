@@ -10,6 +10,9 @@ const del = require('./lib/routes/del.js');
 const App = Service.App; //http app prototype
 
 module.exports.Resource = Resource;
+module.exports.error = {
+    KnexError: require('./lib/error/knexError.js')
+};
 
 //register resource property validation schemas
 Service.Service.on('set-up', function(appManager) {
