@@ -110,7 +110,7 @@ describe('Resource', function() {
             resource.options.should.have.deep.property('db.table', 'users');
         });
 
-        it('should assign a reference of properties object to responseProperties when no responseProperties are defined', function() {
+        it('should set default responseProperties when no responseProperties are defined', function() {
             let resource = new this.Resource({
                 singular: 'user',
                 plural: 'users',
@@ -119,8 +119,10 @@ describe('Resource', function() {
                 }
             });
 
-            resource.options.should.have.deep.property('responseProperties.username');
-            resource.options.responseProperties.should.be.equal(resource.options.properties);
+            resource.options.responseProperties.should.be.eql({
+                id: {type: 'integer'},
+                username: {type: 'string'}
+            });
         });
 
         it('should register itself with Resource.registry', function() {
@@ -165,6 +167,25 @@ describe('Resource', function() {
                 });
 
                 resource.options.should.have.property('softDelete', false);
+            });
+
+            it('should assign timestamp properties to default responseProperties', function() {
+                let resource = new this.Resource({
+                    singular: 'user',
+                    plural: 'users',
+                    timestamps: true,
+                    properties: {
+                        username: {type: 'string'}
+                    }
+                });
+                const expected = {
+                    id: {type: 'integer'},
+                    username: {type: 'string'}
+                }
+                expected[resource.CREATED_AT] = {type: 'string', format: 'date-time'};
+                expected[resource.UPDATED_AT] = {type: 'string', format: 'date-time'};
+
+                resource.getResponseProperties().should.be.eql(expected);
             });
 
             it('should assign default value for CREATED_AT & UPDATED_AT & DELETED_AT options', function() {
@@ -408,27 +429,6 @@ describe('Resource', function() {
             resource.getResponseProperties().should.be.eql({
                 username: {type: 'string'}
             });
-        });
-
-        it('should return generic resource properties definition when response properties arenot defined', function() {
-            let resource = new this.Resource({
-                singular: 'user',
-                plural: 'users',
-                db: {
-                    key: {
-                        name: 'key'
-                    }
-                },
-                properties: {
-                    password: {type: 'string'}
-                },
-            });
-
-            resource.getResponseProperties().should.be.eql({
-                password: {type: 'string'}
-            });
-
-            resource.getResponseProperties().should.be.equal(resource.options.properties);
         });
     });
 
@@ -816,6 +816,7 @@ describe('Resource', function() {
                 throughResource.getPluralName().should.be.equal('resources1_resources2');
                 throughResource.getName().should.be.equal('resource1_resource2');
                 throughResource.getResponseProperties().should.be.eql({
+                    id: {type: 'integer'},
                     resource1_key: {type: 'integer'},
                     resource2_id: {type: 'integer'}
                 });
@@ -843,6 +844,7 @@ describe('Resource', function() {
                 throughResource.getPluralName().should.be.equal('resources1_resources2');
                 throughResource.getName().should.be.equal('resource1_resource2');
                 throughResource.getResponseProperties().should.be.eql({
+                    id: {type: 'integer'},
                     resource1_key: {type: 'integer'},
                     resource2_id: {type: 'integer'}
                 });
