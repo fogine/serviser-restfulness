@@ -26,7 +26,7 @@ describe('Route-setup', function() {
         });
     });
 
-    it.skip('dummy', function(cb) {
+    it.skip('dummy', function() {
     });
 
     function tests() {
