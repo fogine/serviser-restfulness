@@ -97,8 +97,8 @@ Resources are compound data structures describing a data source and how it relat
 ### property json-schema references
 
 There are two `Resource` contructor options `properties` and `responseProperties` holding resource property definitions.  
-`properties` option defines props which value can be set through an API request, usually as part of json-payload of `POST` & `PUT` endpoints
-`responseProperties` option defines props routes can respond with. This is also a whitelist of properties the user of the API can filter resultset by.
+- `properties` option defines props which value can be set through an API request, usually as part of json-payload of `POST` & `PUT` endpoints
+- `responseProperties` option defines props routes can respond with. This is also a whitelist of properties the user of the API can filter resultset by.
 
 Recommended is a conservative approach to what properties are listed in those options as the options are customizable on a route level (by different interface, see [customizing route](#customizing-route)).
 
@@ -130,6 +130,7 @@ Recommended is a conservative approach to what properties are listed in those op
 ```
 
 - Resource property schemas defined as part of `properties` & `responseProperties` constructor options will get registered with [Application](https://lucid-services.github.io/bi-service/App.html) wide `Ajv` validator instance allowing the user to reference property schema from outside of a resource the property belongs to.  
+Properties which reference other property in its schema will NOT be registered with the `Ajv` instance. For example you cant reference `post.user_id` property from the above code example.
 
 ### associations
 
