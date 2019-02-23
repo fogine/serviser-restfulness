@@ -404,7 +404,7 @@ For custom keyword definition see `ajv`'s [official documentation](https://githu
 You can then apply the keyword to a `ajv` validator instance on your `bi-sevice` [HttpApplication](https://lucid-services.github.io/bi-service/App.html#getValidator) object.
 
 ### request lifecycle events and implementing extra logic
-These are extra (asynchronous) events are available on [Route](https://lucid-services.github.io/bi-service/Route.html) objects:
+These extra (asynchronous) events are available on [Route](https://lucid-services.github.io/bi-service/Route.html) objects:
 
 - `after-validation-setup` - emitted once after all default input data validators are attached
 - `bofore-query` - emitted once before the main sql query executed, the event is provided with `req` object and knex `query` object
