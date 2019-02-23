@@ -413,7 +413,7 @@ These extra (asynchronous) events are available on [Route](https://lucid-service
 example:
 
 ```javascript
-const route = users.get(':{key}')
+const route = users.get('/:{key}')
 route.on('before-query', function(req, query) {
     return query.where('banned', false);
 });
