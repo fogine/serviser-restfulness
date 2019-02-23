@@ -403,6 +403,22 @@ There is one more thing we did and thats we applied our custom validation/saniti
 For custom keyword definition see `ajv`'s [official documentation](https://github.com/epoberezkin/ajv/blob/master/CUSTOM.md).  
 You can then apply the keyword to a `ajv` validator instance on your `bi-sevice` [HttpApplication](https://lucid-services.github.io/bi-service/App.html#getValidator) object.
 
+### request lifecycle events and implementing extra logic
+These are extra (asynchronous) events are available on [Route](https://lucid-services.github.io/bi-service/Route.html) objects:
+
+- `after-validation-setup` - emitted once after all default input data validators are attached
+- `bofore-query` - emitted once before the main sql query executed, the event is provided with `req` object and knex `query` object
+- `bofore-response` - emitted once before the response is sent, the user can override the response, the event is provided with `req` object & response data
+
+example:
+
+```javascript
+const route = users.get(':{key}')
+route.on('before-query', function(req, query) {
+    return query.where('banned', false);
+});
+```
+
 
 Tests
 -------------------
