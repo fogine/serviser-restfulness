@@ -478,35 +478,35 @@ TestServiceSDK.prototype.deleteUsersMovie = function deleteUsersMovie(user_id, m
  * @operationId deleteUsersMovie_v1.0
  * @summary
  *
- * @param {integer} [user_id]
+ * @param {integer} [id]
  * @param {Object} options
  * @param {Object} options.data - request body payload in case of PUT|POST|DELETE, query parameters otherwise
  * @param {Object} [options.query]
  * @param {Object} [options.headers]
  * @param {Object} options.path
- * @param {integer} [options.path.user_id]
+ * @param {integer} [options.path.id]
  * @return {Promise<Object>}
  */
-TestServiceSDK.prototype.deleteUsersMovies = function deleteUsersMovies(user_id, options) {
+TestServiceSDK.prototype.deleteUsersMovies = function deleteUsersMovies(id, options) {
 
-    if (typeof user_id === 'object' && user_id !== null && typeof options === 'undefined') {
-        options = user_id;
-        user_id = undefined;
+    if (typeof id === 'object' && id !== null && typeof options === 'undefined') {
+        options = id;
+        id = undefined;
     }
 
-    if (typeof user_id === 'undefined') {
-        user_id = options && options.path && options.path['user_id'];
+    if (typeof id === 'undefined') {
+        id = options && options.path && options.path['id'];
     }
 
     var opt = {
-        url     : "/users/{user_id}/movies",
+        url     : "/users/{id}/movies",
         method  : "delete",
         data    : (options && options.data) !== undefined ? options.data : {},
         params  : (options && options.query) !== undefined ? options.query : {},
         headers : (options && options.headers) !== undefined ? options.headers : {}
     };
 
-    opt.url = opt.url.replace(/{user_id}/, user_id);
+    opt.url = opt.url.replace(/{id}/, id);
 
     return this.$request(opt);
 };
@@ -712,7 +712,7 @@ TestServiceSDK.prototype.putUsersReview = function putUsersReview(user_id, revie
     }
 
     if (typeof review_id === 'undefined') {
-        review_id = options && options.path && options.path['movie_id'];
+        review_id = options && options.path && options.path['review_id'];
     }
 
     var opt = {
@@ -931,24 +931,36 @@ TestServiceSDK.prototype.postMovies = function postMovies(options) {
  * @operationId getMoviesReviews_v1.0
  * @summary 
  *
+ * @param {Integer} id
  * @param {Object} options
  * @param {Object} options.data - request body payload in case of PUT|POST|DELETE, query parameters otherwise
  * @param {Object} [options.query]
  * @param {Object} [options.headers]
  * @param {Object} options.path
+ * @param {Integer} [options.path.id]
  * @return {Promise<Object>}
  */
-TestServiceSDK.prototype.getMoviesReviews = function getMoviesReviews(options) {
+TestServiceSDK.prototype.getMoviesReviews = function getMoviesReviews(id, options) {
 
+
+    if (typeof id === 'object' && id !== null && typeof options === 'undefined') {
+        options = id;
+        id = undefined;
+    }
+
+    if (typeof id === 'undefined') {
+        id = options && options.path && options.path['id'];
+    }
 
     var opt = {
-        url     : "/movies/reviews",
+        url     : "/movies/{id}/reviews",
         method  : "get",
         data    : (options && options.data) !== undefined ? options.data : {},
         params  : (options && options.query) !== undefined ? options.query : {},
         headers : (options && options.headers) !== undefined ? options.headers : {}
     };
 
+    opt.url = opt.url.replace(/{id}/, id);
 
     return this.$request(opt);
 };
