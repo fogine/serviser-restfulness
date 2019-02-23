@@ -67,7 +67,7 @@ Of cource, there is more to be familiarized with when defining REST operations u
     * [customizing route](#customizing-route)
         * [modifying response data](#response-properties)
         * [modifying accepted input data](#input-data-validation)
-    * [about authentication/restricting access](#about-authentication/restricting-access)
+    * [about authentication/restricting access](#about-authenticationrestricting-access)
     * [request lifecycle events and implementing extra logic](#request-lifecycle-events-and-implementing-extra-logic)
 
 ## Resource definition
