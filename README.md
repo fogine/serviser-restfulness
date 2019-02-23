@@ -403,10 +403,35 @@ There is one more thing we did and thats we applied our custom validation/saniti
 For custom keyword definition see `ajv`'s [official documentation](https://github.com/epoberezkin/ajv/blob/master/CUSTOM.md).  
 You can then apply the keyword to a `ajv` validator instance on your `bi-sevice` [HttpApplication](https://lucid-services.github.io/bi-service/App.html#getValidator) object.
 
+### about authentication/restricting access
+
+There is no limitation in defining additional middlewares to be executed before or after data has been validated.  
+
+- attach a middleware that is run before input data are validated
+
+```javascript
+const route = users.get('/:{key}')
+route.step('auth', function auth(req, res) {
+    //do stuff
+});
+```
+
+- attach a middleware that is run after input data are validated
+
+```javascript
+const route = users.get('/:{key}')
+route.once('after-validation-setup', function() {
+    //at this point validation middlewares are already registered with the route
+    route.step('auth', function auth(req, res) {
+        //do stuff
+    });
+})
+```
+
 ### request lifecycle events and implementing extra logic
 These extra (asynchronous) events are available on [Route](https://lucid-services.github.io/bi-service/Route.html) objects:
 
-- `after-validation-setup` - emitted once after all default input data validators are attached
+- `after-validation-setup` - emitted once after all default input data validators are attached, when you attach additional middlewares inside event listener, you can be sure data are validated at that point
 - `bofore-query` - emitted once before the main sql query executed, the event is provided with `req` object and knex `query` object
 - `bofore-response` - emitted once before the response is sent, the user can override the response, the event is provided with `req` object & response data
 
