@@ -241,7 +241,7 @@ Example resource:
             password: {type: 'string'},
             email: {type: 'string'}
         },
-        responseProperties: {//but can be filtered/reduced by there
+        responseProperties: {//but can be filtered/reduced by these
             id: {type: 'integer'},
             username: {type: 'string'}
         }
