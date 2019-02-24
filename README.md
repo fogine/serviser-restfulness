@@ -135,7 +135,7 @@ Recommended is a conservative approach to what properties are listed in those op
 ```
 
 - Resource property schemas defined as part of `properties` & `responseProperties` constructor options will get registered with [Application](https://lucid-services.github.io/bi-service/App.html) wide `Ajv` validator instance allowing the user to reference property schema from outside of a resource the property belongs to.  
-Properties which reference other property in its schema will NOT be registered with the `Ajv` instance. For example you cant reference `post.user_id` property from the above code example.  
+Properties which reference other properties in its schema will NOT be registered with the `Ajv` instance. For example you cant reference `post.user_id` property from the above code example.  
 
 - Note that in order for `json-schema` references to work, resource objects have to be instantiated before you create your [HttpApplication](https://lucid-services.github.io/bi-service/App.html) otherwise you get an error in following format:  
 
