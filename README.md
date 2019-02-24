@@ -459,7 +459,7 @@ route.on('before-query', function(req, query) {
 
 Some validation constants of spetial query properties are configurable through config object:  
 
-```javacript
+```javascript
 const Restfulness = require('bi-service-restfulness');
 
 Restfulness.config.set('limit:maximum'); //query _limit maximum value, default 500
