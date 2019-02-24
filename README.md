@@ -8,6 +8,7 @@ The following is a simplest example of what it takes to design basic REST API op
 
 ```javascript
     //define resources
+    const Resource = require('bi-service-restfulness').Resource;
 
     const movie = new Resource({
         singular: 'movie',
@@ -25,6 +26,8 @@ The following is a simplest example of what it takes to design basic REST API op
         }
     });
 
+    const app = service.buildApp('public');
+
     //define http routers
     const movies = app.buildRestfulRouter({
         url: '/api/{version}/@movies',
@@ -40,6 +43,7 @@ The following is a simplest example of what it takes to design basic REST API op
     movies.del('/');//delete movies
 ```
 
+Thats it, you are done. You have created 6 fully functional API endpoints!  
 With assumption that you were to use `bi-service-doc` plugin, you'd get [THIS generated API documentation](https://fogine.github.io/bi-service-restfulness-documentation-example) of above defined endpoints.  
 On the other hand if you were to plug in `bi-service-sdk` you would get client API SDKs for free.  
 
@@ -73,7 +77,7 @@ Of cource, there is more to be familiarized with when defining REST operations u
 
 ## Resource definition
 
-Resources are compound data structures describing a data source and how it relates to `RDS` (relational database storage).
+Resources are compound data structures describing a data source and how it relates to `RDS` (relational database storage).  
 
 ### constructor options
 
@@ -95,13 +99,13 @@ Resources are compound data structures describing a data source and how it relat
 - `UPDATED_AT` - _optional_, _default_ `updated_at` allows to customize timestamp property name
 - `DELETED_AT` - _optional_, _default_ `deleted_at` allows to customize timestamp property name
 
-### property json-schema references
-
 There are two `Resource` contructor options `properties` and `responseProperties` holding resource property definitions.  
 - `properties` option defines props which value can be set through an API request, usually as part of json-payload of `POST` & `PUT` endpoints
 - `responseProperties` option defines props routes can respond with. This is also a whitelist of properties the user of the API can filter resultset by.
 
 Recommended is a conservative approach to what properties are listed in those options as the options are customizable on a route level (by different interface, see [customizing route](#customizing-route)).
+
+### property json-schema references
 
 ```javascript
     const user = new Resource({
@@ -131,7 +135,11 @@ Recommended is a conservative approach to what properties are listed in those op
 ```
 
 - Resource property schemas defined as part of `properties` & `responseProperties` constructor options will get registered with [Application](https://lucid-services.github.io/bi-service/App.html) wide `Ajv` validator instance allowing the user to reference property schema from outside of a resource the property belongs to.  
-Properties which reference other property in its schema will NOT be registered with the `Ajv` instance. For example you cant reference `post.user_id` property from the above code example.
+Properties which reference other property in its schema will NOT be registered with the `Ajv` instance. For example you cant reference `post.user_id` property from the above code example.  
+
+- Note that in order for `json-schema` references to work, resource objects have to be instantiated before you create your [HttpApplication](https://lucid-services.github.io/bi-service/App.html) otherwise you get an error in following format:  
+
+> Error: can't resolve reference resource-name.column from id #  
 
 ### associations
 
