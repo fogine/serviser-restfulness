@@ -69,6 +69,7 @@ Of cource, there is more to be familiarized with when defining REST operations u
         * [modifying accepted input data](#input-data-validation)
     * [about authentication/restricting access](#about-authenticationrestricting-access)
     * [request lifecycle events and implementing extra logic](#request-lifecycle-events-and-implementing-extra-logic)
+* [Global configuration options](#global-configuration-options)
 
 ## Resource definition
 
@@ -259,6 +260,8 @@ Example resource:
 accepts the following filter parameters (by default, can be modified):  
 - `GET users/?id=1`
 - `DELETE users/?username=anonym`
+
+When filtering by query property of type `string`, `WHERE like %filter-value%` clause will be used by default.
 
 #### single resource queries
 
@@ -452,6 +455,24 @@ route.on('before-query', function(req, query) {
 });
 ```
 
+### Global configuration options
+
+Some validation constants of spetial query properties are configurable through config object:  
+
+```javacript
+const Restfulness = require('bi-service-restfulness');
+
+Restfulness.config.set('limit:maximum'); //query _limit maximum value, default 500
+Restfulness.config.set('limit:minimum'); //query _limit minimum value, default 0
+Restfulness.config.set('limit:default'); // query _limit default value when not provided by API call, default 0 meaning no limit at all
+
+Restfulness.config.set('offset:maximum'); //query _offset maximum value, default Number.MAX_SAFE_INTEGER
+Restfulness.config.set('offset:minimum'); //query _offset minimum value, default 0
+Restfulness.config.set('offset:default'); //query _offset default value, default 0
+
+Restfulness.config.set('embed:maxLength'); //default 256
+Restfulness.config.set('sort:maxLength'); //default 128
+```
 
 Tests
 -------------------
