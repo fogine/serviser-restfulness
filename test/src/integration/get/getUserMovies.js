@@ -146,20 +146,35 @@ describe('GET /api/v1.0/users/:column/movies', function() {
         return this.sdk.getUsersMovies(userId, {
             query: {
                 _sort: 'id',
-                name: 'Title1'
+                name: 'Title20'
             }
         }).then(function(response) {
             expect(response.data.length).to.be.equal(1);
+            const movie = response.data[0];
 
-            response.data.forEach(function(movie, index) {
-                Object.keys(movie).should.be.eql(['id', 'name', 'released_at', 'country_id', 'rating']);
+            Object.keys(movie).should.be.eql(['id', 'name', 'released_at', 'country_id', 'rating']);
 
-                expect(movie.id).to.equal(movieIds[index]);
-                expect(movie.name).to.equal(`Title${index+1}`);
-                expect(movie.rating).to.equal(10);
-                expect(movie.country_id).to.be.equal(countryId);
-                expect(movie.released_at).to.be.a('string');
-            });
+            expect(movie.id).to.equal(movieIds[movieIds.length-1]);
+            expect(movie.name).to.equal(`Title${movieIds.length}`);
+            expect(movie.rating).to.equal(10);
+            expect(movie.country_id).to.be.equal(countryId);
+            expect(movie.released_at).to.be.a('string');
+        });
+    });
+
+    it('should return collection of users` movies which match defined name query filter parameter', function() {
+        const expect = this.expect;
+        const userId = this.userId;
+        const countryId = this.countryId;
+        const movieIds = this.movieIds;
+
+        return this.sdk.getUsersMovies(userId, {
+            query: {
+                _sort: 'id',
+                name: 'Title1'
+            }
+        }).then(function(response) {
+            expect(response.data.length).to.be.equal(11);
         });
     });
 

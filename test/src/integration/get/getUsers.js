@@ -191,6 +191,18 @@ describe('GET /api/v1.0/users', function() {
         });
     });
 
+    it('should return filtered collection by username column (2)', function() {
+        const self = this;
+        const expect = this.expect;
+        const userIds = this.userIds;
+
+        return this.sdk.getUsers({query: {
+            username: 'happie1'
+        }}).then(function(response) {
+            expect(response.data.length).to.be.equal(11);
+        });
+    });
+
     it('should NOT filter result set by password (filter should be ignored)', function() {
         const expect = this.expect;
         const userIds = this.userIds;

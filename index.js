@@ -10,6 +10,7 @@ const del = require('./lib/routes/del.js');
 const App = Service.App; //http app prototype
 
 module.exports.Resource = Resource;
+module.exports.config = require('./lib/config.js');
 module.exports.error = {
     KnexError: require('./lib/error/knexError.js')
 };
