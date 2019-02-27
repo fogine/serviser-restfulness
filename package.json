@@ -1,6 +1,6 @@
 {
     "name": "bi-service-restfulness",
-    "version": "0.1.2",
+    "version": "0.1.6",
     "description": "Automate transparent parts of your REST API",
     "main": "index.js",
     "testFramework": "mocha",
@@ -26,6 +26,7 @@
     ],
     "scripts": {
         "coverage": "./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- --ui bdd -R spec -t 5000 'tests/src/**/*.js'",
+        "migrate": "sqitch deploy db:pg://$POSTGRES_USER@postgres/$POSTGRES_DB && sqitch deploy db:mysql://$MYSQL_USER:$MYSQL_PASSWORD@mysql/$MYSQL_DATABASE",
         "test:docker": "cd ./test/src/integration ; docker-compose run --name bi-service-restfulness-test --rm test ; exit_code=$? ; docker-compose down -v ; exit $exit_code",
         "test:shell": "cd ./test/src/integration ; docker-compose run -v $(pwd)/../../../:/app -v /app/node_modules --name bi-service-restfulness-test-shell --rm test bash ; docker-compose down -v",
         "test": "mocha --ui bdd --exit --colors --check-leaks -t 5000 --reporter spec 'test/src/unit/index.js'",
