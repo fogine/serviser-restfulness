@@ -546,7 +546,6 @@ describe('Resource', function() {
         });
     });
 
-
     describe('associations', function() {
         beforeEach(function() {
             this.resource1 = new this.Resource({
@@ -912,6 +911,195 @@ describe('Resource', function() {
                 this.expect(function() {
                     self.resource1.belongsToMany({});
                 }).to.throw(TypeError);
+            });
+        });
+    });
+
+    describe('query', function() {
+        before(function() {
+            this.knex = this.Knex({
+                client: 'pg',
+                connection: {
+                    host : process.env.POSTGRES_HOST,
+                    user : process.env.POSTGRES_USER,
+                    password : process.env.POSTGRES_PASSWORD,
+                    database : process.env.POSTGRES_DB
+                }
+            });
+            this.runner = this.sinon.stub(this.KnexRunner.prototype, 'query');
+            this.ensureConnection = this.sinon.stub(this.KnexRunner.prototype, 'ensureConnection').resolves({});
+        });
+
+        after(function() {
+            this.runner.restore();
+            this.ensureConnection.restore();
+        });
+
+        beforeEach(function() {
+            this.runner.reset();
+        });
+
+        it('should return a new QueryBuilder', function() {
+            let resource = new this.Resource({
+                singular: 'user',
+                plural: 'users',
+                properties: {}
+            });
+
+            resource.query(this.knex).should.be.instanceof(this.KnexBuilder);
+        });
+
+        describe('insert', function() {
+            it('should append created_at & updated_at timestamps', function() {
+                const self = this;
+                let resource = new this.Resource({
+                    singular: 'user',
+                    plural: 'users',
+                    timestamps: true,
+                    properties: {}
+                });
+
+                return resource.query(this.knex).insert({
+                    username: 'value'
+                }).then(function() {
+                    self.runner.should.be.calledOnce;
+                    self.runner.should.be.calledWith(self.sinon.match({
+                        bindings: ['value'],
+                        sql: 'insert into "users" ("created_at", "updated_at", "username") values (now(), now(), ?)'
+                    }));
+                });
+            });
+
+            it('should not modify the query when resources timestamps option is false', function() {
+                const self = this;
+                let resource = new this.Resource({
+                    singular: 'user',
+                    plural: 'users',
+                    timestamps: false,
+                    properties: {}
+                });
+
+                return resource.query(this.knex).insert({
+                    username: 'value'
+                }).then(function() {
+                    self.runner.should.be.calledOnce;
+                    self.runner.should.be.calledWith(self.sinon.match({
+                        bindings: ['value'],
+                        sql: 'insert into "users" ("username") values (?)'
+                    }));
+                });
+            });
+        });
+
+        describe('update', function() {
+            it('should autoupdate updated_at timestamp', function() {
+                const self = this;
+                let resource = new this.Resource({
+                    singular: 'user',
+                    plural: 'users',
+                    timestamps: true,
+                    properties: {}
+                });
+
+                return resource.query(this.knex).update('username', 'value').then(function() {
+                    self.runner.should.be.calledOnce;
+                    self.runner.should.be.calledWith(self.sinon.match({
+                        sql: 'update "users" set "username" = ?, "updated_at" = now()'
+                    }));
+                });
+            });
+
+            it('should not update timestamps if resource doesnt have them', function() {
+                const self = this;
+                let resource = new this.Resource({
+                    singular: 'user',
+                    plural: 'users',
+                    timestamps: false,
+                    properties: {}
+                });
+
+                return resource.query(this.knex).update('username', 'value').then(function() {
+                    self.runner.should.be.calledOnce;
+                    self.runner.should.be.calledWith(self.sinon.match({
+                        sql: 'update "users" set "username" = ?'
+                    }));
+                });
+            });
+        });
+
+        describe('delete', function() {
+            it('should perform update instead of delete when resources solfDelete option is true', function() {
+                const self = this;
+                let resource = new this.Resource({
+                    singular: 'user',
+                    plural: 'users',
+                    softDelete: true,
+                    properties: {}
+                });
+
+                return resource.query(this.knex).where('id', 1).del().then(function() {
+                    self.runner.should.be.calledOnce;
+                    self.runner.should.be.calledWith(self.sinon.match({
+                        bindings: [1],
+                        sql: 'update "users" set "deleted_at" = now() where "id" = ?'
+                    }));
+                });
+            });
+
+            it('should execute delete operation when resources softDelete option is false', function() {
+                const self = this;
+                let resource = new this.Resource({
+                    singular: 'user',
+                    plural: 'users',
+                    softDelete: false,
+                    properties: {}
+                });
+
+                return resource.query(this.knex).where('id', 1).del().then(function() {
+                    self.runner.should.be.calledOnce;
+                    self.runner.should.be.calledWith(self.sinon.match({
+                        bindings: [1],
+                        sql: 'delete from "users" where "id" = ?'
+                    }));
+                });
+            });
+        });
+
+        describe('select', function() {
+            it('should append where deleted_at is null clause when resources softDelete option is true', function() {
+                const self = this;
+                let resource = new this.Resource({
+                    singular: 'user',
+                    plural: 'users',
+                    softDelete: true,
+                    properties: {}
+                });
+
+                return resource.query(this.knex).where('id', 1).select().then(function() {
+                    self.runner.should.be.calledOnce;
+                    self.runner.should.be.calledWith(self.sinon.match({
+                        bindings: [1],
+                        sql: 'select * from "users" where "id" = ? and "users"."deleted_at" is null'
+                    }));
+                });
+            });
+
+            it('should not modify sql query when the resources softDelete option is false', function() {
+                const self = this;
+                let resource = new this.Resource({
+                    singular: 'user',
+                    plural: 'users',
+                    softDelete: false,
+                    properties: {}
+                });
+
+                return resource.query(this.knex).where('id', 1).select().then(function() {
+                    self.runner.should.be.calledOnce;
+                    self.runner.should.be.calledWith(self.sinon.match({
+                        bindings: [1],
+                        sql: 'select * from "users" where "id" = ?'
+                    }));
+                });
             });
         });
     });

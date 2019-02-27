@@ -1,9 +1,12 @@
-const sinon     = require('sinon');
-const chai      = require('chai');
-const sinonChai = require("sinon-chai");
-const Service   = require('bi-service');
-const path      = require('path');
-const _         = require('lodash');
+const sinon       = require('sinon');
+const chai        = require('chai');
+const sinonChai   = require("sinon-chai");
+const Service     = require('bi-service');
+const path        = require('path');
+const _           = require('lodash');
+const Knex        = require('knex');
+const KnexRunner  = require('knex/lib/runner');
+const KnexBuilder = require('knex/lib/query/builder');
 
 const QuerySegmentCollection = require('../../../lib/querySegmentCollection.js');
 const Resource               = require('../../../lib/resource.js');
@@ -31,6 +34,9 @@ describe('unit tests', function() {
         this.sinon = sinon;
         this._ = _;
 
+        this.Knex = Knex;
+        this.KnexRunner = KnexRunner;
+        this.KnexBuilder = KnexBuilder;
         this.Resource = Resource;
         this.QuerySegment = QuerySegment;
         this.QuerySegmentCollection = QuerySegmentCollection;

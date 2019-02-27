@@ -1,5 +1,4 @@
 const Promise    = require('bluebird');
-const Knex       = require('knex');
 const KnexRunner = require('knex/lib/runner');
 const KnexBuilder = require('knex/lib/query/builder');
 const ServiceSDK = require('../../service/sdk.js');
