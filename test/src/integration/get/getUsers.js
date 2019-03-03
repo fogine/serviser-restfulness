@@ -220,11 +220,11 @@ describe('GET /api/v1.0/users', function() {
         const userIds = this.userIds;
 
         return this.sdk.getUsers({query: {
-            username: '$@!*(^$)'
+            id: '$@!*(^$)'
         }}).should.be.rejected.then(function(response) {
             expect(response.code).to.be.equal(400);
             expect(response.apiCode).to.be.equal('validationFailure');
-            expect(response.message).to.match(/\.username/);
+            expect(response.message).to.match(/\.id/);
         });
     });
 });

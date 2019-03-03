@@ -92,17 +92,34 @@ describe('DELETE /api/v1.0/users', function() {
         });
     });
 
-    it('should return 400 json response with validation error when username path parameter is invalid', function() {
+    it('should return 400 json response with validation error when id path parameter is invalid', function() {
         const expect = this.expect;
+
+        return this.sdk.deleteUsers({
+            query: {
+                id: 'test'
+            }
+        }).should.be.rejected.then(function(response) {
+            expect(response.code).to.be.equal(400);
+            expect(response.apiCode).to.be.equal('validationFailure');
+            expect(response.message).to.be.equal('.id should be integer');
+        });
+    });
+
+    it('should not delete anything and return x-total-count=0', function() {
+        const expect = this.expect;
+        const knex = this.knex;
+        const userId = this.userId;
 
         return this.sdk.deleteUsers({
             query: {
                 username: '$!@)($*!)'
             }
-        }).should.be.rejected.then(function(response) {
-            expect(response.code).to.be.equal(400);
-            expect(response.apiCode).to.be.equal('validationFailure');
-            expect(response.message).to.be.equal('.username should match pattern "^[a-z0-9-_]+$"');
+        }).then(function(response) {
+            expect(response.status).to.be.equal(204);
+            expect(response.headers['x-total-count']).to.be.equal('0');
+
+            return knex('users').select().should.eventually.be.an('array').that.has.length(3);
         });
     });
 });
