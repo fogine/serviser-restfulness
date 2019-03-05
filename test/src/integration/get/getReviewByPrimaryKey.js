@@ -138,7 +138,7 @@ describe('GET /api/v1.0/reviews/:id', function() {
             query: {_embed: 'user.password'}
         }).should.be.rejected.then(function(response) {
             expect(response.code).to.be.equal(400);
-            response.message.should.match(/Invalid _embed parameter resource path/);
+            response.message.should.match(/Can not embed user.password. Invalid _embed resource./);
         });
     });
 

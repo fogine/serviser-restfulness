@@ -103,12 +103,9 @@ describe('GET /api/v1.0/users', function() {
         const expect = this.expect;
         const userId = this.userId;
 
-        //sort of tests that _embed parameter is ignored (striped out
-        //is unit tested separately
-        //TODO
         return this.sdk.getUsers({
             query: {_embed: '!@*($&!)'}
-        });
+        }).should.be.fulfilled;
     });
 
     it('should return ordered collection of resources', function() {
@@ -133,6 +130,19 @@ describe('GET /api/v1.0/users', function() {
                 expect(user.created_at).to.be.a('string');
                 expect(user.updated_at).to.be.a('string');
             });
+        });
+    });
+
+    it('should 400 response when trying to sort by a column which is not part of response data', function() {
+        const self = this;
+        const expect = this.expect;
+
+
+        return this.sdk.getUsers({query: {
+            _sort: '-password,password'
+        }}).should.be.rejected.then(function(response) {
+            expect(response.code).to.be.equal(400);
+            expect(response.message).to.match(/Invalid _sort target password./);
         });
     });
 
@@ -194,7 +204,6 @@ describe('GET /api/v1.0/users', function() {
     it('should return filtered collection by username column (2)', function() {
         const self = this;
         const expect = this.expect;
-        const userIds = this.userIds;
 
         return this.sdk.getUsers({query: {
             username: 'happie1'
@@ -205,7 +214,6 @@ describe('GET /api/v1.0/users', function() {
 
     it('should NOT filter result set by password (filter should be ignored)', function() {
         const expect = this.expect;
-        const userIds = this.userIds;
 
         return this.sdk.getUsers({query: {
             password: 'secret15'
@@ -217,7 +225,6 @@ describe('GET /api/v1.0/users', function() {
     it('should return 400 json response with validation error when filter parameter value is invalid', function() {
         const self = this;
         const expect = this.expect;
-        const userIds = this.userIds;
 
         return this.sdk.getUsers({query: {
             id: '$@!*(^$)'
@@ -225,6 +232,51 @@ describe('GET /api/v1.0/users', function() {
             expect(response.code).to.be.equal(400);
             expect(response.apiCode).to.be.equal('validationFailure');
             expect(response.message).to.match(/\.id/);
+        });
+    });
+
+    describe('_filter', function() {
+        it('should return multiple user records based on provided query filter {id: {in: [<id1>,<id2>]}}', function() {
+            const self = this;
+            const expect = this.expect;
+            const userIds = this.userIds;
+
+            return this.sdk.getUsers({query: {
+                _filter: {id: {in:[userIds[0], userIds[1]]}}
+            }}).then(function(response) {
+                expect(response.data.length).to.be.equal(2);
+                expect(response.data[0].id).to.be.equal(userIds[0]);
+                expect(response.data[1].id).to.be.equal(userIds[1]);
+                expect(response.headers).to.have.property('link');
+            });
+        });
+
+        it('should return user records witch match provided query filter {username: {like: "happie%"}, id: {not: {eq: <primary_key>}}}', function() {
+            const self = this;
+            const expect = this.expect;
+            const userIds = this.userIds;
+
+            return this.sdk.getUsers({query: {
+                _filter: {
+                    username: {like: 'happie%'},
+                    id: {not: {eq: userIds[0]}},
+                }
+            }}).then(function(response) {
+                expect(response.data.length).to.be.equal(19);
+                expect(response.headers).to.have.property('link');
+            });
+        });
+
+        it('should return 400 json response with validation error when filter is applied to a column which is not part of response data', function() {
+            const self = this;
+            const expect = this.expect;
+
+            return this.sdk.getUsers({query: {
+                _filter: {password: {eq: 'secret1'}}
+            }}).should.be.rejected.then(function(response) {
+                expect(response.code).to.be.equal(400);
+                expect(response.message).to.match(/Invalid _filter target\(s\) password/);
+            });
         });
     });
 });

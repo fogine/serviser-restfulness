@@ -109,6 +109,37 @@ describe('DELETE /api/v1.0/users/:column/reviews', function() {
         });
     });
 
+    describe('_filter', function() {
+        it('should delete multiple review records based on provided query filter {id: {in: [<id1>]}}', function() {
+            const self = this;
+
+            return this.sdk.deleteUsersReviews(self.userId, {
+                query: {
+                    _filter: {id: {in:[self.reviewId]}}
+                }
+            }).then(function(response) {
+                self.expect(response.status).to.be.equal(204);
+                self.expect(response.headers['x-total-count']).to.be.equal('1');
+
+                return self.knex('reviews').select().should.eventually.be.an('array')
+                    .that.is.has.length(1).and.has.deep.property('[0].id', self.reviewId2);
+            });
+        });
+
+        it('should return 400 json response with validation error when filter is applied to a non-primary key column', function() {
+            const self = this;
+
+            return this.sdk.deleteUsersReviews(self.userId, {
+                query: {
+                    _filter: {user_id: {eq: self.userId}}
+                }
+            }).should.be.rejected.then(function(response) {
+                self.expect(response.code).to.be.equal(400);
+                self.expect(response.message).to.match(/Invalid _filter target\(s\) user_id/);
+            });
+        });
+    });
+
     it('should not delete anything and return 204 with correct x-total-count header', function() {
         const self = this;
 

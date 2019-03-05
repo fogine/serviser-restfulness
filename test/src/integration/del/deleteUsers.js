@@ -78,6 +78,44 @@ describe('DELETE /api/v1.0/users', function() {
         });
     });
 
+    describe('_filter', function() {
+        it('should soft-delete multiple user records based on provided query filter {id: {in: [<id1>,<id2>]}}', function() {
+            const self = this;
+            const expect = this.expect;
+            const knex = this.knex;
+
+            return this.sdk.deleteUsers({
+                query: {
+                    _filter: {id: {in:[self.userId, self.userId2]}}
+                }
+            }).then(function(response) {
+                expect(response.status).to.be.equal(204);
+                expect(response.headers['x-total-count']).to.be.equal('2');
+
+                return knex('users').whereNotNull('deleted_at').pluck('id').should.eventually.be.an('array').that.is.eql([self.userId, self.userId2]);
+            }).then(function(user) {
+                return knex('users').where({
+                    deleted_at: null,
+                    id: self.userId3
+                }).first().should.eventually.be.a('object');
+            });
+        });
+
+        it('should return 400 json response with validation error when filter is applied to a non-primary key column', function() {
+            const expect = this.expect;
+            const userId = this.userId;
+
+            return this.sdk.getUsersMovies(userId, {
+                query: {
+                    _filter: {username: {eq: 'happie'}}
+                }
+            }).should.be.rejected.then(function(response) {
+                expect(response.code).to.be.equal(400);
+                expect(response.message).to.match(/Invalid _filter target\(s\) username/);
+            });
+        });
+    });
+
     it('should soft-delete all user resources', function() {
         const expect = this.expect;
         const knex = this.knex;

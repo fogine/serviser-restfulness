@@ -113,6 +113,40 @@ describe('DELETE /api/v1.0/users/:column/movies', function() {
         });
     });
 
+    describe('_filter', function() {
+        it('should deassociate movie from the user based on provided query filter {id: {in: [<id1>]}}', function() {
+            const self = this;
+
+            return this.sdk.deleteUsersMovies(self.userId, {
+                query: {
+                    _filter: {id: {in:[self.movieId]}}
+                }
+            }).then(function(response) {
+                self.expect(response.status).to.be.equal(204);
+                self.expect(response.headers['x-total-count']).to.be.equal('1');
+
+                return self.knex('users').where('id', self.userId).first().should.eventually.be.a('object');
+            }).then(function(user) {
+                return self.knex('movies').select().should.eventually.be.an('array').that.has.length(2);
+            }).then(function() {
+                return self.knex('movies_users').first().should.eventually.be.a('object').that.has.property('id', self.movieUserId2);
+            });
+        });
+
+        it('should return 400 json response with validation error when filter is applied to a non-primary key column', function() {
+            const self = this;
+
+            return this.sdk.deleteUsersMovies(self.userId, {
+                query: {
+                    _filter: {name: {eq: 'name'}}
+                }
+            }).should.be.rejected.then(function(response) {
+                self.expect(response.code).to.be.equal(400);
+                self.expect(response.message).to.match(/Invalid _filter target\(s\) name/);
+            });
+        });
+    });
+
     it('should not delete nor deassociate anything and return 204 with correct x-total-count header', function() {
         const self = this;
 

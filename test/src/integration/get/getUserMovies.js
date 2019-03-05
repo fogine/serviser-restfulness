@@ -178,6 +178,39 @@ describe('GET /api/v1.0/users/:column/movies', function() {
         });
     });
 
+    describe('_filter', function() {
+        it('should return multiple movie records based on provided query filter {id: {in: [<id1>,<id2>]}}', function() {
+            const expect = this.expect;
+            const userId = this.userId;
+            const movieIds = this.movieIds;
+
+            return this.sdk.getUsersMovies(userId, {
+                query: {
+                    _filter: {id: {in:[movieIds[0], movieIds[1]]}}
+                }
+            }).then(function(response) {
+                expect(response.data.length).to.be.equal(2);
+                expect(response.data[0].id).to.be.equal(movieIds[0]);
+                expect(response.data[1].id).to.be.equal(movieIds[1]);
+                expect(response.headers).to.have.property('link');
+            });
+        });
+
+        it('should return 400 json response with validation error when filter is applied to a column which is not part of response data', function() {
+            const expect = this.expect;
+            const userId = this.userId;
+
+            return this.sdk.getUsersMovies(userId, {
+                query: {
+                    _filter: {description: {like: 'description'}}
+                }
+            }).should.be.rejected.then(function(response) {
+                expect(response.code).to.be.equal(400);
+                expect(response.message).to.match(/Invalid _filter target\(s\) description/);
+            });
+        });
+    });
+
     it('should embed country resource in each users movie resource', function() {
         const expect = this.expect;
         const userId = this.userId;
@@ -256,7 +289,7 @@ describe('GET /api/v1.0/users/:column/movies', function() {
             query: {_embed: 'country.code2'}
         }).should.be.rejected.then(function(response) {
             expect(response.code).to.be.equal(400);
-            response.message.should.match(/Invalid _embed parameter resource path/);
+            response.message.should.match(/Can not embed country.code2. Invalid _embed resource./);
         });
     });
 
