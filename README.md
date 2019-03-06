@@ -51,7 +51,7 @@ Of cource, there is more to be familiarized with when defining REST operations u
 
 * [Resource definition](#resource-definition)
     * [constructor options](#constructor-options)
-    * [property json-schema references](#property-json-schema-references)
+    * [json-schema column references](#json-schema-column-references)
     * [associations](#associations)
     * [API](#api)
         * [Resource.registry](#resrouceregistry)
@@ -63,6 +63,7 @@ Of cource, there is more to be familiarized with when defining REST operations u
         * [Resource.prototype.getKeyName()](resourceprototypegetkeyname)
         * [Resource.prototype.prop()](resourceprototypeprop)
         * [Resource.prototype.hasProp()](resourceprototypehasprop)
+        * [Resource.prototype.query(knex)](resourceprototypequery)
         * [Resource.prototype.belongsTo()](resourceprototypebelongstoresource-options)
         * [Resource.prototype.hasMany()](resourceprototypehasmanyresource-options)
         * [Resource.prototype.belongsToMany()](resourceprototypebelongstomanyresource-options)
@@ -78,6 +79,8 @@ Of cource, there is more to be familiarized with when defining REST operations u
 ## Resource definition
 
 Resources are compound data structures describing a data source and how it relates to `RDS` (relational database storage).  
+
+**Disclaimer:** This library is NOT a `ORM`. Resources do NOT implement `active-record` pattern.  
 
 ### constructor options
 
@@ -100,12 +103,12 @@ Resources are compound data structures describing a data source and how it relat
 - `DELETED_AT` - _optional_, _default_ `deleted_at` allows to customize timestamp property name
 
 There are two `Resource` contructor options `properties` and `responseProperties` holding resource property definitions.  
-- `properties` option defines props which value can be set through an API request, usually as part of json-payload of `POST` & `PUT` endpoints
-- `responseProperties` option defines props routes can respond with. This is also a whitelist of properties the user of the API can filter resultset by.
+- `properties` option describes `columns` whose values might be set through an API request, usually as part of json-payload of `POST` & `PUT` endpoints
+- `responseProperties` option describes `columns` that routes can respond with. This is also default whitelist of properties the user of the API can filter resultset by.  
 
-Recommended is a conservative approach to what properties are listed in those options as the options are customizable on a route level (by different interface, see [customizing route](#customizing-route)).
+The developer can of course overwrite input & response definitions on per route basis (see [customizing route](#customizing-route))  
 
-### property json-schema references
+### json-schema column references
 
 ```javascript
     const user = new Resource({
@@ -180,6 +183,14 @@ returns name of resource primary key
 returns property schema as defined either in `properties` or `responseProperties` object. `properties` object takes precendence.
 #### `Resource.prototype.hasProp()`
 returns `boolean` value. True if property is defined either in `properties` or `responseProperties` object.
+#### `Resource.prototype.query()`
+```javascript
+/*
+ * @param {Knex} knex
+ * return {QueryBuilder}
+ */
+```
+returns `knex` query builder for resource table. Automaticaly handles table `timestamps`
 #### `Resource.prototype.belongsTo(resource, options)`
 ```javascript
 /*
@@ -231,46 +242,6 @@ Defines Many to Many association between `sourceResource.belongsToMany(targetRes
 
 ### list of supported REST operations
 
-#### spetial `_embed` query parameter
-
-Accepted by all GET routes. Eager loads associated One to One resources (embedding collections is not supported).  
-Examples:  
-- `GET posts/1?_embed=user` - embeds whole user resource in the response - meaning embeds all properties defined as part of `responseProperties` user resource option
-- `GET posts/1?_embed=user.username,user.id` - embeds user username and id in the response
-
-#### spetial `_sort` & `_limit` & `_offset` query parameters
-
-Accepted by GET routes that return a collection of resources.  
-Allows to sort records and limit number of fetched records (paginate results)
-Example:  
-- `GET users/?_sort=username,-id` - order by username ASC, id DESC
-
-#### filtering results or reducing scope of delete queries
-
-Accepted by GET and DELETE routes that operate on a collection of resources.  
-Routes that support it, accept query parameter filters which are named after targed resource's response properties.  
-Example resource:  
-```javascript
-    const user = new Resource({
-        singular: 'user',
-        plural: 'users',
-        properties: { //results can  NOT be reduced by these properties
-            password: {type: 'string'},
-            email: {type: 'string'}
-        },
-        responseProperties: {//but can be filtered/reduced by these
-            id: {type: 'integer'},
-            username: {type: 'string'}
-        }
-    });
-```
-
-accepts the following filter parameters (by default, can be modified):  
-- `GET users/?id=1`
-- `DELETE users/?username=anonym`
-
-When filtering by query property of type `string`, `WHERE like %filter-value%` clause will be generated by default.
-
 #### single resource queries
 
 - `GET @resource/:{key}` - fetch resource response properties by primary key
@@ -321,6 +292,84 @@ When filtering by query property of type `string`, `WHERE like %filter-value%` c
 ###### one to one
 - `GET @resource1/:{key}/@resource2/:{key}` - fetch resource2 which belongs to resource1 
 - `GET @resource1/:property/@resource2/:property` - fetch resource2 which belongs to resource1
+
+
+#### spetial `_embed` query parameter
+
+Accepted by all GET routes. Eager loads associated One to One resources (embedding collections is not supported).  
+Examples:  
+- `GET posts/1?_embed=user` - embeds whole user resource in the response - meaning embeds all properties defined as part of `responseProperties` user resource option
+- `GET posts/1?_embed=user.username,user.id` - embeds user username and id in the response
+
+#### spetial `_sort` & `_limit` & `_offset` query parameters
+
+Accepted by GET routes that return a collection of resources.  
+Allows to sort records and limit number of fetched records (paginate results)
+Example:  
+- `GET users/?_sort=username,-id` - order by username ASC, id DESC
+
+#### filtering results or reducing scope of delete queries
+
+Accepted by GET and DELETE routes that operate on a collection of resources.  
+Example resource:  
+```javascript
+    const user = new Resource({
+        singular: 'user',
+        plural: 'users',
+        properties: { //results can  NOT be reduced by these properties
+            password: {type: 'string'},
+            email: {type: 'string'}
+        },
+        responseProperties: {//but can be filtered/reduced by these
+            id: {type: 'integer'},
+            username: {type: 'string'}
+        }
+    });
+```
+
+Considering the above code example, endpoints accept the following filter parameters (by default, can be modified):  
+- `GET users/?id=1`
+- `DELETE users/?username=anonym`
+
+When filtering by query property of type `string`, `WHERE like %filter-value%` clause will be generated.  
+
+#### spetial `_filter` query parameter
+
+In addition to simple query filters described above, related routes accept compound `_filter` parameter which must be a serialized json object in the following format:  
+
+```javascript
+{
+    column: schema,
+    //condition negation
+    column2: {not: schema}
+}
+
+//where schema is valid according to:
+{
+    type: 'object',
+    properties: {
+        eq: {type: ['string', 'number', 'null', 'boolean']}, //equal to
+        gt: {type: 'number'}, //greater than
+        gte: {type: 'number'}, //greater than or equal
+        lt: {type: 'number'}, //lower than
+        lte: {type: 'number'}, //lower than or equal
+        like: {type: 'string'},
+        iLike: {type: 'string'}, //case insensitive like
+        between: {
+            type: 'array',
+            maxItems: 2,
+            minItems: 2,
+            items: {type: ['string', 'number']}
+        },
+        in: {
+            type: 'array',
+            maxItems: config.getOrFail('filter:maxItems'),
+            minItems: 1,
+            items: {type: ['string', 'number']}
+        }
+    }
+}
+```
 
 ### customizing route
 
@@ -375,14 +424,14 @@ users
 .get('/:{key}')
 .respondsWith({
     type: 'object',
-    additionalProperties: false,//IMPORTANT!
+    additionalProperties: false,//always make sure to filter out any unexpected properties
     properties: {
         username: {$ref: 'user.username'}
     }
 });
 ```
 simple, right? You just define a custom `json-schema`.   
-That being said, by defining your cuctom response schema its entirely up to you what features will be enabled.  
+That being said, by defining your cuctom response schema, you are essentially overwriting defaults.  
 For example the above custom schema does not allow any associated resources to be embedded along.
 
 ##### input data validation
@@ -401,7 +450,7 @@ users
 .post('/')
 .validate({
     type: 'object',
-    additionalProperties: false,//IMPORTANT!
+    additionalProperties: false,//always make sure to filter out any unexpected properties
     properties: {
         name: {$ref: 'user.name'},
         username: {$ref: 'user.username'},
@@ -420,22 +469,23 @@ In the custom payload validator schema above, we make sure `password_confirmatio
 
 There is one more thing we did and thats we applied our custom validation/sanitization keyword to the valid password field which will make sure the password gets transformed into a more secure hash.  
 For custom keyword definition see `ajv`'s [official documentation](https://github.com/epoberezkin/ajv/blob/master/CUSTOM.md).  
-You can then apply the keyword to a `ajv` validator instance on your `bi-sevice` [HttpApplication](https://lucid-services.github.io/bi-service/App.html#getValidator) object.
+You can then register the keyword to a `ajv` validator instance on your `bi-sevice` [HttpApplication](https://lucid-services.github.io/bi-service/App.html#getValidator) object.
 
 ### about authentication/restricting access
 
-There is no limitation in defining additional middlewares to be executed before or after data has been validated.  
+You can define additional middlewares before or after data has been validated.  
 
-- attach a middleware that is run before input data are validated
+- push a middleware to the top of middleware call stack that is run before input data are validated
 
 ```javascript
 const route = users.get('/:{key}')
 route.step('auth', function auth(req, res) {
     //do stuff
 });
+route.validate(jsonSchema, 'query');
 ```
 
-- attach a middleware that is run after input data are validated
+- push a middleware on top of middleware call stack, immediately after default input data validators
 
 ```javascript
 const route = users.get('/:{key}')
@@ -480,6 +530,11 @@ Restfulness.config.set('offset:default'); //query _offset default value, default
 
 Restfulness.config.set('embed:maxLength'); //default 256
 Restfulness.config.set('sort:maxLength'); //default 128
+Restfulness.config.set('filter:maxLength'); //default 32
+Restfulness.config.set('filter:minLength'); //default 0
+Restfulness.config.set('filter:minimum'); //default Number.MAX_SAFE_INTEGER
+Restfulness.config.set('filter:maximum'); //default Number.MIN_SAFE_INTEGER
+Restfulness.config.set('filter:maxItems'); //default 10
 ```
 
 Tests

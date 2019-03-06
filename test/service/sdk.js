@@ -126,6 +126,44 @@ TestServiceSDK.prototype.getUser = function getUser(id, options) {
 };
 /**
  * @method
+ * @name TestServiceSDK#getMovie
+ * @operationId getMovie_v1.0
+ * @summary 
+ *
+ * @param {integer} [id]
+ * @param {Object} options
+ * @param {Object} options.data - request body payload in case of PUT|POST|DELETE, query parameters otherwise
+ * @param {Object} [options.query]
+ * @param {Object} [options.headers]
+ * @param {Object} options.path
+ * @param {integer} [options.path.id]
+ * @return {Promise<Object>}
+ */
+TestServiceSDK.prototype.getMovie = function getMovie(id, options) {
+
+    if (typeof id === 'object' && id !== null && typeof options === 'undefined') {
+        options = id;
+        id = undefined;
+    }
+
+    if (typeof id === 'undefined') {
+        id = options && options.path && options.path['id'];
+    }
+
+    var opt = {
+        url     : "/movies/{id}",
+        method  : "get",
+        data    : (options && options.data) !== undefined ? options.data : {},
+        params  : (options && options.query) !== undefined ? options.query : {},
+        headers : (options && options.headers) !== undefined ? options.headers : {}
+    };
+
+    opt.url = opt.url.replace(/{id}/, id);
+
+    return this.$request(opt);
+};
+/**
+ * @method
  * @name TestServiceSDK#getReviews
  * @operationId getUsers_v1.0
  * @summary 

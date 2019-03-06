@@ -122,6 +122,21 @@ function createEndpoints() {
     movies.get('/:{key}(\\d+)/@countries/:{key}(\\d+)');//get movie country
     movies.get('/:{key}(\\d+)/@countries/:code_2');//get movie country
     movies.get('/:name/@countries/:code_2');//get movie country
+    movies.get('/:{key}').respondsWith({
+        type: 'object',
+        additionalProperties: false,
+        properties: {
+            id: {type: 'integer'},
+            name: {type: 'string'},
+            country: {
+                type: 'object',
+                additionalProperties: false,
+                properties: {
+                    name: {type: 'string'}
+                }
+            }
+        }
+    });//get movie
 
     movies.post('/');//create new movie
     movies.put('/:{key}');//update a movie
