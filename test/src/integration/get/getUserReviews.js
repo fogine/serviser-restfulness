@@ -231,6 +231,18 @@ describe('GET /api/v1.0/users/:column/reviews', function() {
             });
         });
 
+        it('should allow to _filter by associated resource of type one to one (1x1)', function() {
+            const expect = this.expect;
+            const userId = this.userId;
+            const reviewIds = this.reviewIds;
+
+            return this.sdk.getUsersReviews(userId, {query: {
+                _filter: {'movie.name': {like: 'Title1%'}}
+            }}).then(function(response) {
+                expect(response.data.length).to.be.equal(11);
+            });
+        });
+
         it('should return 400 json response with validation error when filter is applied to a column which is not part of response data', function() {
             const expect = this.expect;
             const userId = this.userId;
@@ -239,7 +251,8 @@ describe('GET /api/v1.0/users/:column/reviews', function() {
                 _filter: {invalidcolumn: {eq: 'val'}}
             }}).should.be.rejected.then(function(response) {
                 expect(response.code).to.be.equal(400);
-                expect(response.message).to.match(/Invalid _filter target\(s\) invalidcolumn/);
+                expect(response.apiCode).to.be.equal('validationFailure');
+                expect(response.message).to.match(/._filter unsupported property invalidcolumn/);
             });
         });
     });

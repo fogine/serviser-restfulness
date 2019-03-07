@@ -1,6 +1,7 @@
 const Service = require('bi-service');
 const Resource = require('./lib/resource.js');
 const utils = require('./lib/utils.js');
+const registerCustomKeywords = require('./lib/validator.js').registerCustomKeywords;
 
 const get = require('./lib/routes/get.js');
 const post = require('./lib/routes/post.js');
@@ -19,6 +20,7 @@ module.exports.error = {
 Service.Service.on('set-up', function(appManager) {
     appManager.on('build-app', function(app) {
         const validator = app.getValidator();
+        registerCustomKeywords(validator);
         Resource.registry.forEach(function(resource) {
             validator.addSchema(resource._getCommonProperties());
         });

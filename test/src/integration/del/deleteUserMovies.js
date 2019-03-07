@@ -142,7 +142,8 @@ describe('DELETE /api/v1.0/users/:column/movies', function() {
                 }
             }).should.be.rejected.then(function(response) {
                 self.expect(response.code).to.be.equal(400);
-                self.expect(response.message).to.match(/Invalid _filter target\(s\) name/);
+                self.expect(response.apiCode).to.be.equal('validationFailure');
+                self.expect(response.message).to.match(/._filter unsupported property name/);
             });
         });
     });

@@ -371,6 +371,8 @@ In addition to simple query filters described above, related routes accept compo
 }
 ```
 
+`_filter` accepts only those column defined as part of route response schema.
+
 ### customizing route
 
 ```javascript
@@ -473,7 +475,7 @@ You can then register the keyword to a `ajv` validator instance on your `bi-sevi
 
 ### about authentication/restricting access
 
-You can define additional middlewares before or after data has been validated.  
+You can define additional middlewares before or after data validation procedures.  
 
 - push a middleware to the top of middleware call stack that is run before input data are validated
 

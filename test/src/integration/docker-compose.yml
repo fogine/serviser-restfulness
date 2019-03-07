@@ -12,7 +12,8 @@ x-env: &x-env
   MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
 services:
   test:
-    build: ../../../
+    #build: ../../../
+    image: 'bi-service-restfulness'
     environment:
       <<: *x-env
       NODE_ENV: ${NODE_ENV:-development}
@@ -25,8 +26,7 @@ services:
       >
        /wait-for-it.sh postgres:5432 --
        /wait-for-it.sh mysql:3306 -- bash -c
-       ' sqitch deploy db:pg://$$POSTGRES_USER@postgres/$$POSTGRES_DB
-       && sqitch deploy db:mysql://$$MYSQL_USER:$$MYSQL_PASSWORD@mysql/$$MYSQL_DATABASE
+       ' npm run migrate
        && npm run test:integration'
   postgres:
     image: "postgres:11-alpine"

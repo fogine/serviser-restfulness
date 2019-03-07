@@ -275,7 +275,8 @@ describe('GET /api/v1.0/users', function() {
                 _filter: {password: {eq: 'secret1'}}
             }}).should.be.rejected.then(function(response) {
                 expect(response.code).to.be.equal(400);
-                expect(response.message).to.match(/Invalid _filter target\(s\) password/);
+                expect(response.apiCode).to.be.equal('validationFailure');
+                expect(response.message).to.match(/._filter unsupported property password/);
             });
         });
     });

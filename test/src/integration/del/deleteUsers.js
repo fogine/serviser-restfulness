@@ -111,7 +111,8 @@ describe('DELETE /api/v1.0/users', function() {
                 }
             }).should.be.rejected.then(function(response) {
                 expect(response.code).to.be.equal(400);
-                expect(response.message).to.match(/Invalid _filter target\(s\) username/);
+                expect(response.apiCode).to.be.equal('validationFailure');
+                expect(response.message).to.match(/._filter unsupported property username/);
             });
         });
     });
