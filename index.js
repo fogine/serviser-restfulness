@@ -1,4 +1,4 @@
-const Service = require('bi-service');
+const Service = require('serviser');
 const Resource = require('./lib/resource.js');
 const utils = require('./lib/utils.js');
 const registerCustomKeywords = require('./lib/validator.js').registerCustomKeywords;

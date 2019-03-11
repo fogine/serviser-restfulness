@@ -20,7 +20,7 @@ RUN apk --no-cache add --virtual native-deps \
   yarn cache clean --force && \
   apk del native-deps
 
-RUN ln -s /app/node_modules/.bin/bi-service /bin/bi-service
+RUN ln -s /app/node_modules/.bin/serviser /bin/serviser
 
 COPY . .
 

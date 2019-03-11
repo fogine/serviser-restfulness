@@ -12,8 +12,7 @@ x-env: &x-env
   MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
 services:
   test:
-    #build: ../../../
-    image: 'bi-service-restfulness'
+    build: ../../../
     environment:
       <<: *x-env
       NODE_ENV: ${NODE_ENV:-development}

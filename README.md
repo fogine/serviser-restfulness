@@ -1,14 +1,14 @@
-[![Build Status](https://travis-ci.org/BohemiaInteractive/bi-service-restfulness.svg?branch=master)](https://travis-ci.org/BohemiaInteractive/bi-service-restfulness)  [![Test Coverage](https://codeclimate.com/github/BohemiaInteractive/bi-service-restfulness/badges/coverage.svg)](https://codeclimate.com/github/BohemiaInteractive/bi-service-restfulness/coverage) [![npm version](https://badge.fury.io/js/bi-service-restfulness.svg)](https://www.npmjs.com/package/bi-service-restfulness)  
+[![Build Status](https://travis-ci.org/lucid-services/serviser-restfulness.svg?branch=master)](https://travis-ci.org/lucid-services/serviser-restfulness)  [![Test Coverage](https://codeclimate.com/github/lucid-services/serviser-restfulness/badges/coverage.svg)](https://codeclimate.com/github/lucid-services/serviser-restfulness/coverage) [![npm version](https://badge.fury.io/js/serviser-restfulness.svg)](https://www.npmjs.com/package/serviser-restfulness)  
 
 
-`bi-service-restfulness` is yet another `bi-service` plugin that will help you with your REST API implementation by generating fully functional API endpoints that operate on your ralational database backed resources.  
+`serviser-restfulness` is yet another `serviser` plugin that will help you with your REST API implementation by generating fully functional API endpoints that operate on your ralational database backed resources.  
 That being said, its up to the user to decide when it's more appropriate to implement a route from scratch due to its increasing complexity.
 
 The following is a simplest example of what it takes to design basic REST API operations:  
 
 ```javascript
     //define resources
-    const Resource = require('bi-service-restfulness').Resource;
+    const Resource = require('serviser-restfulness').Resource;
 
     const movie = new Resource({
         singular: 'movie',
@@ -44,10 +44,10 @@ The following is a simplest example of what it takes to design basic REST API op
 ```
 
 Thats it, you are done. You have created 6 fully functional API endpoints!  
-With assumption that you were to use `bi-service-doc` plugin, you'd get [THIS generated API documentation](https://fogine.github.io/bi-service-restfulness-documentation-example) of above defined endpoints.  
-On the other hand if you were to plug in `bi-service-sdk` you would get client API SDKs for free.  
+With assumption that you were to use `serviser-doc` plugin, you'd get [THIS generated API documentation](https://fogine.github.io/serviser-restfulness-documentation-example) of above defined endpoints.  
+On the other hand if you were to plug in `serviser-sdk` you would get client API SDKs for free.  
 
-Of cource, there is more to be familiarized with when defining REST operations using `bi-service-restfulness`:  
+Of cource, there is more to be familiarized with when defining REST operations using `serviser-restfulness`:  
 
 * [Resource definition](#resource-definition)
     * [constructor options](#constructor-options)
@@ -137,10 +137,10 @@ The developer can of course overwrite input & response definitions on per route 
     });
 ```
 
-- Resource property schemas defined as part of `properties` & `responseProperties` constructor options will get registered with [Application](https://lucid-services.github.io/bi-service/App.html) wide `Ajv` validator instance allowing the user to reference property schema from outside of a resource the property belongs to.  
+- Resource property schemas defined as part of `properties` & `responseProperties` constructor options will get registered with [Application](https://lucid-services.github.io/serviser/App.html) wide `Ajv` validator instance allowing the user to reference property schema from outside of a resource the property belongs to.  
 Properties which reference other properties in its schema will NOT be registered with the `Ajv` instance. For example you cant reference `post.user_id` property from the above code example.  
 
-- Note that in order for `json-schema` references to work, resource objects have to be instantiated before you create your [HttpApplication](https://lucid-services.github.io/bi-service/App.html) otherwise you get an error in following format:  
+- Note that in order for `json-schema` references to work, resource objects have to be instantiated before you create your [HttpApplication](https://lucid-services.github.io/serviser/App.html) otherwise you get an error in following format:  
 
 > Error: can't resolve reference resource-name.column from id #  
 
@@ -149,7 +149,7 @@ Properties which reference other properties in its schema will NOT be registered
 When designing a route which operates on multiple resources, eg:  
 > /api/v1.0/@users/:{key}/@posts/:{key}  
 
-the user must tell `bi-service-restfulness` how the resources are related to each other in order for the operation to function properly: 
+the user must tell `serviser-restfulness` how the resources are related to each other in order for the operation to function properly: 
 
 ```javascript
 //defines relation of user to the post and relation of post to the user.
@@ -398,11 +398,11 @@ In addition to simple query filters described above, related routes accept compo
     });
 ```
 
-`Router`'s `get` & `post` & `put` &  `del` methods all return an uninitialized `bi-service` [HttpRoute](https://lucid-services.github.io/bi-service/Route.html) object.  
+`Router`'s `get` & `post` & `put` &  `del` methods all return an uninitialized `serviser` [HttpRoute](https://lucid-services.github.io/serviser/Route.html) object.  
 The user is given time to manualy initialize the route in the current event loop tick, that is
 to define validation rules for `headers` & `body` & `query` & `params` objects and/or response schema or even to implement or tweak
 the main route's logic.  
-`bi-service-restfulness` schedules initialization procedures that will execute on the next event loop tick and will set default behavior and rules
+`serviser-restfulness` schedules initialization procedures that will execute on the next event loop tick and will set default behavior and rules
 where it's not been done by the user.
 
 ```javascript
@@ -471,7 +471,7 @@ In the custom payload validator schema above, we make sure `password_confirmatio
 
 There is one more thing we did and thats we applied our custom validation/sanitization keyword to the valid password field which will make sure the password gets transformed into a more secure hash.  
 For custom keyword definition see `ajv`'s [official documentation](https://github.com/epoberezkin/ajv/blob/master/CUSTOM.md).  
-You can then register the keyword to a `ajv` validator instance on your `bi-sevice` [HttpApplication](https://lucid-services.github.io/bi-service/App.html#getValidator) object.
+You can then register the keyword to a `ajv` validator instance on your `serviser` [HttpApplication](https://lucid-services.github.io/serviser/App.html#getValidator) object.
 
 ### about authentication/restricting access
 
@@ -500,7 +500,7 @@ route.once('after-validation-setup', function() {
 ```
 
 ### request lifecycle events and implementing extra logic
-These extra (asynchronous) events are available on [Route](https://lucid-services.github.io/bi-service/Route.html) objects:
+These extra (asynchronous) events are available on [Route](https://lucid-services.github.io/serviser/Route.html) objects:
 
 - `after-validation-setup` - emitted once after all default input data validators are attached, when you attach additional middlewares inside event listener, you can be sure data are validated at that point
 - `bofore-query` - emitted once before the main sql query executed, the event is provided with `req` object and knex `query` object
@@ -520,7 +520,7 @@ route.on('before-query', function(req, query) {
 Some validation constants of spetial query properties are configurable through config object:  
 
 ```javascript
-const Restfulness = require('bi-service-restfulness');
+const Restfulness = require('serviser-restfulness');
 
 Restfulness.config.set('limit:maximum'); //query _limit maximum value, default 500
 Restfulness.config.set('limit:minimum'); //query _limit minimum value, default 0

@@ -1,6 +1,6 @@
 const path    = require('path');
-const Service = require('bi-service');
-const Config  = require('bi-config');
+const Service = require('serviser');
+const Config  = require('serviser-config');
 const index   = require('../../../index.js');
 
 describe('Router', function() {
