@@ -16,7 +16,7 @@ services:
     environment:
       <<: *x-env
       NODE_ENV: ${NODE_ENV:-development}
-      SQL_DEBUG: 1
+      SQL_DEBUG: 0
       DEBUG:
     depends_on:
       - postgres
@@ -26,6 +26,7 @@ services:
        /wait-for-it.sh postgres:5432 --
        /wait-for-it.sh mysql:3306 -- bash -c
        ' npm run migrate
+       && npm test
        && npm run test:integration'
   postgres:
     image: "postgres:11-alpine"

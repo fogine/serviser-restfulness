@@ -18,7 +18,10 @@ describe('Route-setup', function() {
             let port = app.server.address().port;
 
             sdk = new ServiceSDK({
-                baseURL: `http://127.0.0.1:${port}`
+                baseURL: `http://127.0.0.1:${port}`,
+                headers: {
+                    'content-type': 'application/json'
+                }
             });
 
             describe('Route', tests);

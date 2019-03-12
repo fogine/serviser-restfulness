@@ -1,7 +1,7 @@
 {
     "name": "serviser-restfulness",
-    "version": "0.4.0",
-    "description": "Automate transparent parts of your REST API",
+    "version": "0.5.1",
+    "description": "Instant REST API - serviser plugin",
     "main": "index.js",
     "testFramework": "mocha",
     "author": "fogine",
@@ -15,7 +15,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/fogine/serviser-restfulness"
+        "url": "https://github.com/lucid-services/serviser-restfulness"
     },
     "license": "GPL-3.0",
     "files": [

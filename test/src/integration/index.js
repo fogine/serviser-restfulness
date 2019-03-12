@@ -69,7 +69,10 @@ describe('integration tests', function() {
 
             self.port = port;
             self.sdk = new ServiceSDK({
-                baseURL: `http://127.0.0.1:${port}`
+                baseURL: `http://127.0.0.1:${port}`,
+                headers: {
+                    'content-type': 'application/json'
+                }
             });
         });
     }
