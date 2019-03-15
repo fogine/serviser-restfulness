@@ -371,7 +371,14 @@ In addition to simple query filters described above, related routes accept compo
 }
 ```
 
-`_filter` accepts only those column defined as part of route response schema.
+`_filter` accepts only those column defined as part of route response schema.  
+
+**Explicitly define what columns can be used for reducing dataset scope through query parameters:**  
+
+> route.reducesDatasetBy(['id', 'user.username']);
+
+`reducesDatasetBy()` overwrites the default whitelisted column set.  
+Empty array disables query filters altogether
 
 ### customizing route
 
