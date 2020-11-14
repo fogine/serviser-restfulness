@@ -27,8 +27,8 @@
     ],
     "scripts": {
         "coverage": "./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- --ui bdd -R spec -t 5000 'tests/src/**/*.js'",
-        "migrate": "sqitch deploy db:pg://$POSTGRES_USER@postgres/$POSTGRES_DB && sqitch deploy db:mysql://$MYSQL_USER:$MYSQL_PASSWORD@mysql/$MYSQL_DATABASE",
-        "db:clean": "sqitch revert -y db:pg://$POSTGRES_USER@postgres/$POSTGRES_DB && sqitch revert -y db:mysql://$MYSQL_USER:$MYSQL_PASSWORD@mysql/$MYSQL_DATABASE",
+        "migrate": "sqitch deploy db:pg://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres/$POSTGRES_DB && sqitch deploy db:mysql://$MYSQL_USER:$MYSQL_PASSWORD@mysql/$MYSQL_DATABASE",
+        "db:clean": "sqitch revert -y db:pg://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres/$POSTGRES_DB && sqitch revert -y db:mysql://$MYSQL_USER:$MYSQL_PASSWORD@mysql/$MYSQL_DATABASE",
         "test:docker": "cd ./test/src/integration ; docker-compose run --name serviser-restfulness-test --rm test ; exit_code=$? ; docker-compose down -v ; exit $exit_code",
         "test:shell": "cd ./test/src/integration ; docker-compose run -v $(pwd)/../../../:/app -v /app/node_modules --name serviser-restfulness-test-shell --rm test bash ; docker-compose down -v",
         "test": "mocha --ui bdd --exit --colors --check-leaks -t 5000 --reporter spec 'test/src/unit/index.js'",
