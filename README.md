@@ -564,6 +564,6 @@ You will be dropped in docker container shell where you can run:
 ```bash
 > npm run migrate
 > npm test
-> npm test:integration
+> npm run test:integration
 ```
 Your project files on host systems will be mounted into the container's fs so you can edit and immediately test changes to the project files.  
