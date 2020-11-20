@@ -1,3 +1,3 @@
-## FUTURE
+## 0.6.1
 
-* [ADDED] - initial release
+* [ADDED] - `route.reducesDatasetBy(Array<string>)` method
