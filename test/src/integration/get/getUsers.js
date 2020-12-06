@@ -99,13 +99,15 @@ describe('GET /api/v1.0/users', function() {
         });
     });
 
-    it('should not accept _embed query parameter', function() {
+    it('should return 400 response when requested property to eager load doesnt exist or is private/internal only', function() {
         const expect = this.expect;
-        const userId = this.userId;
 
         return this.sdk.getUsers({
             query: {_embed: '!@*($&!)'}
-        }).should.be.fulfilled;
+        }).should.be.rejected.then(function(response) {
+            expect(response.code).to.be.equal(400);
+            response.message.should.match(/._embed should match pattern/);
+        });
     });
 
     it('should return ordered collection of resources', function() {

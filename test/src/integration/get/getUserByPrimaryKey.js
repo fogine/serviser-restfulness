@@ -22,11 +22,21 @@ describe('GET /api/v1.0/users/:id', function() {
             }).returning('id');
         }).then(function(result) {
             this.userId2 = result[0];
+
+            return this.knex('user_details').insert({
+                country: 'US',
+                user_id: this.userId
+            }).returning('id');
+        }).then(function(result) {
+            this.userDetailId = result[0];
         });
     });
 
     after(function() {
-        return this.knex('users').whereIn('id', [this.userId, this.userId2]).del();
+        const self = this;
+        return this.knex('user_details').whereIn('id', [this.userDetailId]).del().then(function() {
+            return self.knex('users').whereIn('id', [self.userId, self.userId2]).del();
+        });
     });
 
     it('should return 200 json response with user details', function() {
@@ -44,13 +54,35 @@ describe('GET /api/v1.0/users/:id', function() {
         });
     });
 
-    it('should not accept _embed query parameter', function() {
+    it('should return 400 response when requested property to eager load doesnt exist or is private/internal only', function() {
         const expect = this.expect;
-        const userId = this.userId;
 
         return this.sdk.getUser(this.userId, {
             query: {_embed: '!@*($&!)'}
-        }).should.be.fulfilled;
+        }).should.be.rejected.then(function(response) {
+            expect(response.code).to.be.equal(400);
+            response.message.should.match(/._embed should match pattern/);
+        });
+    });
+
+    it('should accept _embed=user_detail query parameter and return embedded user_detail record', function() {
+        const expect = this.expect;
+        const userId = this.userId;
+        const userDetailId = this.userDetailId;
+
+        return this.sdk.getUser(this.userId, {
+            query: {_embed: 'user_detail'}
+        }).then(function(response) {
+            expect(response.status).to.be.equal(200);
+
+            Object.keys(response.data).should.be.eql(['id','username', 'subscribed', 'created_at', 'updated_at', 'user_detail']);
+
+            response.data.user_detail.should.be.eql({
+                id: userDetailId,
+                user_id: userId,
+                country: 'US'
+            })
+        });
     });
 
     it('should return 400 json response with user.notFound api code', function() {

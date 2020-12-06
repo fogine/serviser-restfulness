@@ -228,6 +228,18 @@ function createResources() {
         }
     });
 
+    const userDetail = new Resource({
+        singular: 'user_detail',
+        plural: 'user_details',
+        dynamicDefaults: {},
+        timestamps: false,
+        softDelete: false,
+        properties: {
+            user_id: {$ref: 'user.id'},
+            country: {type: 'string', minLength: 2, maxLength: 3, pattern: '^[A-Z]+$'}
+        }
+    });
+
     const review = new Resource({
         singular: 'review',
         plural: 'reviews',
@@ -265,6 +277,7 @@ function createResources() {
     });
 
     user.belongsToMany(movie);
+    user.hasOne(userDetail);
     movie.hasMany(review);
     movie.belongsTo(country);
     user.hasMany(review);
