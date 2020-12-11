@@ -1,3 +1,7 @@
+## FUTURE
+
+* [CHANGED] - make ajv validation keyword whitelists configurable for response & query properties validation schemas. By default query parameter validation whitelist includes `format` keyword.
+
 ## 0.7.0
 
 * [ADDED] - `resource.hasOne()` method to define 1x1 relationship
