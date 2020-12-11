@@ -1,4 +1,4 @@
-## FUTURE
+## 0.8.0
 
 * [CHANGED] - make ajv validation keyword whitelists configurable for response & query properties validation schemas. By default query parameter validation whitelist includes `format` keyword.
 * [FIXED] - query filter `iLike` keyword was executing incorrect query
