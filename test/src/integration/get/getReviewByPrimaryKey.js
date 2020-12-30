@@ -1,6 +1,7 @@
 
 describe('GET /api/v1.0/reviews/:id', function() {
     before(function() {
+        const self = this;
         return this.knex('users').insert({
             username: 'happie',
             password: 'secret',
@@ -8,26 +9,26 @@ describe('GET /api/v1.0/reviews/:id', function() {
             email: 'email@email.com',
             created_at: this.knex.raw('now()'),
             updated_at: this.knex.raw('now()')
-        }).returning('id').bind(this).then(function(result) {
-            this.userId = result[0];
+        }).returning('id').then(function(result) {
+            self.userId = result[0];
 
-            return this.knex('movies').insert({
+            return self.knex('movies').insert({
                 name: 'Star Trek',
                 description: 'description',
                 released_at: '2018-01-10',
                 rating: 10
             }).returning('id');
-        }).bind(this).then(function(result) {
-            this.movieId = result[0];
+        }).then(function(result) {
+            self.movieId = result[0];
 
-            return this.knex('reviews').insert({
+            return self.knex('reviews').insert({
                 stars: 8,
                 comment: 'comment',
-                movie_id: this.movieId,
-                user_id: this.userId
+                movie_id: self.movieId,
+                user_id: self.userId
             }).returning('id');
-        }).bind(this).then(function(result) {
-            this.reviewId = result[0];
+        }).then(function(result) {
+            self.reviewId = result[0];
         });
     });
 
@@ -36,7 +37,7 @@ describe('GET /api/v1.0/reviews/:id', function() {
         let ids = [this.reviewId, this.userId, this.movieId];
 
         return this.Promise.each(['reviews', 'users', 'movies'], function(table, index) {
-            return self.knex(table).where({id: ids[index]}).del().reflect();
+            return self.Promise.resolve(self.knex(table).where({id: ids[index]}).del()).reflect();
         });
     });
 

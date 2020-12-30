@@ -10,7 +10,10 @@ describe('Route-setup', function() {
         const self = this;
         sinon = this.sinon;
         runner = this.sinon.stub(KnexRunner.prototype, 'query');
-        ensureConnection = this.sinon.stub(KnexRunner.prototype, 'ensureConnection').resolves({});
+        ensureConnection = this.sinon.stub(this.KnexRunner.prototype, 'ensureConnection').callsFake(async function(cb) {
+            let connection = {};
+            return await cb(connection);
+        });
 
         service = require('../../service/index.js')('pg', 0);
         return service.listen().then(function() {
@@ -106,7 +109,7 @@ describe('Route-setup', function() {
                         this.routeEmitAsyncSpy.restore();
                     });
 
-                    it('should emit before-query event with req & knexQueryBuilder parameters', function() {
+                    it.only('should emit before-query event with req & knexQueryBuilder parameters', function() {
                         const routeEmitAsyncSpy = this.routeEmitAsyncSpy.withArgs('before-query');
 
                         return sdk[route.description.sdkMethodName]({

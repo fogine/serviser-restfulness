@@ -1,32 +1,35 @@
 
 describe('POST /api/v1.0/users/:column/movies', function() {
     before(function() {
+        const self = this;
+
         return this.knex('users').insert({
             username: 'happiemovies',
             password: 'pwd',
             subscribed: false,
             email: 'email@email.com',
-            created_at: this.knex.raw('now()'),
-            updated_at: this.knex.raw('now()')
-        }).returning('id').bind(this).then(function(result) {
-            this.userId = result[0];
+            created_at: self.knex.raw('now()'),
+            updated_at: self.knex.raw('now()')
+        }).returning('id').then(function(result) {
+            self.userId = result[0];
 
-            return this.knex('countries').insert({
+            return self.knex('countries').insert({
                 name: 'United Kingdom',
                 code_2: 'UK'
             }).returning('id');
         }).then(function(result) {
-            this.countryId = result[0];
+            self.countryId = result[0];
         });
     });
 
     after(function() {
-        return this.knex('movies_users').del().bind(this).then(function() {
-            return this.knex('users').del();
+        const self = this;
+        return this.knex('movies_users').del().then(function() {
+            return self.knex('users').del();
         }).then(function() {
-            return this.knex('movies').del();
+            return self.knex('movies').del();
         }).then(function() {
-            return this.knex('countries').del();
+            return self.knex('countries').del();
         });
     });
 

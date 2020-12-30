@@ -1,42 +1,45 @@
 
 describe('PUT /api/v1.0/users/:id/movies/:id', function() {
     before(function() {
+        const self = this;
         return this.knex('users').insert({
             username: 'happie',
             password: 'secret',
             subscribed: false,
             email: 'email@email.com',
-            created_at: this.knex.raw('now()'),
-            updated_at: this.knex.raw('now()')
-        }).returning('id').bind(this).then(function(result) {
-            this.userId = result[0];
+            created_at: self.knex.raw('now()'),
+            updated_at: self.knex.raw('now()')
+        }).returning('id').then(function(result) {
+            self.userId = result[0];
 
-            return this.knex('movies').insert({
+            return self.knex('movies').insert({
                 name: 'name',
                 description: 'description',
                 released_at: '2019-01-01',
-                country_id: this.countryId,
+                country_id: self.countryId,
                 rating: 10
             }).returning('id');
         }).then(function(result) {
-            this.movieId = result[0];
+            self.movieId = result[0];
 
-            return this.knex('movies').insert({
+            return self.knex('movies').insert({
                 name: 'name2',
                 description: 'description2',
                 released_at: '2019-01-01',
                 rating: 1
             }).returning('id');
         }).then(function(result) {
-            this.movieId2 = result[0];
+            self.movieId2 = result[0];
         });
     });
 
     after(function() {
-        return this.knex('movies_users').del().bind(this).then(function() {
-            return this.knex('movies').whereIn('id', [this.movieId, this.movieId2]).del();
+        const self = this;
+
+        return self.knex('movies_users').del().then(function() {
+            return self.knex('movies').whereIn('id', [self.movieId, self.movieId2]).del();
         }).then(function() {
-            return this.knex('users').where({id: this.userId}).del();
+            return self.knex('users').where({id: self.userId}).del();
         });
     });
 

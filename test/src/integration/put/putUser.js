@@ -1,17 +1,18 @@
 
 describe('PUT /api/v1.0/users/:column', function() {
     beforeEach(function() {
+        const self = this;
         return this.knex('users').insert({
             username: 'happie',
             password: 'secret',
             subscribed: false,
             email: 'email@email.com',
-            created_at: this.knex.raw('now()'),
-            updated_at: this.knex.raw('now()')
-        }).returning('id').bind(this).then(function(result) {
-            this.userId = result[0];
+            created_at: self.knex.raw('now()'),
+            updated_at: self.knex.raw('now()')
+        }).returning('id').then(function(result) {
+            self.userId = result[0];
 
-            return this.Promise.delay(1000);//so day updated_at timestamp has different value
+            return self.Promise.delay(1000);//so day updated_at timestamp has different value
         });
     });
 

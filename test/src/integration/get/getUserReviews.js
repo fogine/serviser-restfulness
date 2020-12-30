@@ -1,6 +1,8 @@
 
 describe('GET /api/v1.0/users/:column/reviews', function() {
     before(function() {
+        const self = this;
+
         return this.knex('users').insert({
             username: 'happie',
             password: 'secret',
@@ -8,8 +10,8 @@ describe('GET /api/v1.0/users/:column/reviews', function() {
             email: 'email@email.com',
             created_at: this.knex.raw('now()'),
             updated_at: this.knex.raw('now()')
-        }).returning('id').bind(this).then(function(result) {
-            this.userId = result[0];
+        }).returning('id').then(function(result) {
+            self.userId = result[0];
 
             const movieRows = [];
             for (let i = 0, len = 20; i < len; i++) {
@@ -21,52 +23,54 @@ describe('GET /api/v1.0/users/:column/reviews', function() {
                 });
             }
 
-            return this.knex.batchInsert('movies', movieRows, 20).returning('id');
+            return self.knex.batchInsert('movies', movieRows, 20).returning('id');
         }).then(function(ids) {
-            this.movieIds = this.utils.expandResourceIds(ids, 20);
+            self.movieIds = self.utils.expandResourceIds(ids, 20);
 
             const reviewRows = [];
             for (let i = 0, len = 20; i < len; i++) {
                 reviewRows.push({
                     stars: 10,
                     comment: 'comment',
-                    movie_id: this.movieIds[i],
-                    user_id: this.userId
+                    movie_id: self.movieIds[i],
+                    user_id: self.userId
                 });
             }
-            return this.knex.batchInsert('reviews', reviewRows, 20).returning('id');
+            return self.knex.batchInsert('reviews', reviewRows, 20).returning('id');
         }).then(function(ids) {
-            this.reviewIds = this.utils.expandResourceIds(ids, 20);
+            self.reviewIds = self.utils.expandResourceIds(ids, 20);
 
-            return this.knex('users').insert({
+            return self.knex('users').insert({
                 username: 'happie22',
                 password: 'secret2',
                 subscribed: false,
                 email: 'email2@email.com',
-                created_at: this.knex.raw('now()'),
-                updated_at: this.knex.raw('now()'),
-                deleted_at: this.knex.raw('now()')
+                created_at: self.knex.raw('now()'),
+                updated_at: self.knex.raw('now()'),
+                deleted_at: self.knex.raw('now()')
             }).returning('id');
         }).then(function(result) {
-            this.deletedUserId = result[0];
+            self.deletedUserId = result[0];
 
-            return this.knex('reviews').insert({
+            return self.knex('reviews').insert({
                 stars: 8,
                 comment: 'comment',
-                movie_id: this.movieIds[0],
-                user_id: this.deletedUserId
+                movie_id: self.movieIds[0],
+                user_id: self.deletedUserId
             }).returning('id');
         }).then(function(result) {
-            this.deletedUserReviewId = result[0];
+            self.deletedUserReviewId = result[0];
         });
     });
 
     after(function() {
-        return this.knex('reviews').whereIn('id', this.reviewIds.concat([this.deletedUserReviewId]))
-            .del().bind(this).then(function() {
-                return this.knex('movies').whereIn('id', this.movieIds).del();
+        const self = this;
+
+        return self.knex('reviews').whereIn('id', self.reviewIds.concat([self.deletedUserReviewId]))
+            .del().then(function() {
+                return self.knex('movies').whereIn('id', self.movieIds).del();
             }).then(function() {
-                return this.knex('users').whereIn('id', [this.userId, this.deletedUserId]).del();
+                return self.knex('users').whereIn('id', [self.userId, self.deletedUserId]).del();
             });
     });
 

@@ -1,32 +1,34 @@
 
 describe('POST /api/v1.0/users/:column/reviews', function() {
     before(function() {
-        return this.knex('users').insert({
+        const self = this;
+        return self.knex('users').insert({
             username: 'happie',
             password: 'secret',
             subscribed: false,
             email: 'email@email.com',
-            created_at: this.knex.raw('now()'),
-            updated_at: this.knex.raw('now()')
-        }).returning('id').bind(this).then(function(result) {
-            this.userId = result[0];
+            created_at: self.knex.raw('now()'),
+            updated_at: self.knex.raw('now()')
+        }).returning('id').then(function(result) {
+            self.userId = result[0];
 
-            return this.knex('movies').insert({
+            return self.knex('movies').insert({
                 name: 'name',
                 description: 'description',
                 released_at: '2019-01-01',
                 rating: 10
             }).returning('id');
         }).then(function(result) {
-            this.movieId = result[0];
+            self.movieId = result[0];
         });
     });
 
     after(function() {
-        return this.knex('reviews').del().bind(this).then(function() {
-            return this.knex('users').del();
+        const self = this;
+        return self.knex('reviews').del().then(function() {
+            return self.knex('users').del();
         }).then(function() {
-            return this.knex('movies').del();
+            return self.knex('movies').del();
         });
     });
 

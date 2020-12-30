@@ -1,6 +1,8 @@
 
 describe('GET /api/v1.0/users/:id', function() {
     before(function() {
+        const self = this;
+
         return this.knex('users').insert({
             username: 'happie',
             password: 'secret',
@@ -8,27 +10,27 @@ describe('GET /api/v1.0/users/:id', function() {
             email: 'email@email.com',
             created_at: this.knex.raw('now()'),
             updated_at: this.knex.raw('now()')
-        }).returning('id').bind(this).then(function(result) {
-            this.userId = result[0];
+        }).returning('id').then(function(result) {
+            self.userId = result[0];
 
-            return this.knex('users').insert({
+            return self.knex('users').insert({
                 username: 'happie2',
                 password: 'secret2',
                 subscribed: false,
                 email: 'email2@email.com',
-                created_at: this.knex.raw('now()'),
-                updated_at: this.knex.raw('now()'),
-                deleted_at: this.knex.raw('now()')
+                created_at: self.knex.raw('now()'),
+                updated_at: self.knex.raw('now()'),
+                deleted_at: self.knex.raw('now()')
             }).returning('id');
         }).then(function(result) {
-            this.userId2 = result[0];
+            self.userId2 = result[0];
 
-            return this.knex('user_details').insert({
+            return self.knex('user_details').insert({
                 country: 'US',
-                user_id: this.userId
+                user_id: self.userId
             }).returning('id');
         }).then(function(result) {
-            this.userDetailId = result[0];
+            self.userDetailId = result[0];
         });
     });
 

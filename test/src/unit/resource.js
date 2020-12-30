@@ -927,7 +927,11 @@ describe('Resource', function() {
                 }
             });
             this.runner = this.sinon.stub(this.KnexRunner.prototype, 'query');
-            this.ensureConnection = this.sinon.stub(this.KnexRunner.prototype, 'ensureConnection').resolves({});
+
+            this.ensureConnection = this.sinon.stub(this.KnexRunner.prototype, 'ensureConnection').callsFake(async function(cb) {
+                let connection = {};
+                return await cb(connection);
+            });
         });
 
         after(function() {

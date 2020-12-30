@@ -16,12 +16,13 @@ describe('GET /api/v1.0/users', function() {
 
         rows[20].deleted_at = this.knex.raw('now()');
 
+        const self = this;
+
         return this.knex.batchInsert('users', rows, 21)
             .returning('id')
-            .bind(this)
             .then(function(ids) {
-                this.userIds = this.utils.expandResourceIds(ids, 21);
-                this.deletedUserId = this.userIds.pop();
+                self.userIds = self.utils.expandResourceIds(ids, 21);
+                self.deletedUserId = self.userIds.pop();
             });
 
     });

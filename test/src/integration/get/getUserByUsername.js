@@ -1,15 +1,16 @@
 
 describe('GET /api/v1.0/users/:username', function() {
     before(function() {
-        return this.knex('users').insert({
+        const self = this;
+        return self.knex('users').insert({
             username: 'happie',
             password: 'secret',
             subscribed: false,
             email: 'email@email.com',
-            created_at: this.knex.raw('now()'),
-            updated_at: this.knex.raw('now()')
-        }).returning('id').bind(this).then(function(result) {
-            this.userId = result[0];
+            created_at: self.knex.raw('now()'),
+            updated_at: self.knex.raw('now()')
+        }).returning('id').then(function(result) {
+            self.userId = result[0];
         });
     });
 

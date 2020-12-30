@@ -1,62 +1,64 @@
 
 describe('DELETE /api/v1.0/users/:column/reviews', function() {
     beforeEach(function() {
+        const self = this;
         return this.knex('users').insert({
             username: 'happie',
             password: 'secret',
             subscribed: false,
             email: 'email@email.com',
-            created_at: this.knex.raw('now()'),
-            updated_at: this.knex.raw('now()')
-        }).returning('id').bind(this).then(function(result) {
-            this.userId = result[0];
+            created_at: self.knex.raw('now()'),
+            updated_at: self.knex.raw('now()')
+        }).returning('id').then(function(result) {
+            self.userId = result[0];
 
-            return this.knex('movies').insert({
+            return self.knex('movies').insert({
                 name: 'name',
                 description: 'description',
                 released_at: '2019-01-01',
-                country_id: this.countryId,
+                country_id: self.countryId,
                 rating: 10
             }).returning('id');
         }).then(function(result) {
-            this.movieId = result[0];
+            self.movieId = result[0];
 
-            return this.knex('movies').insert({
+            return self.knex('movies').insert({
                 name: 'name2',
                 description: 'description',
                 released_at: '2019-01-02',
-                country_id: this.countryId,
+                country_id: self.countryId,
                 rating: 5
             }).returning('id');
         }).then(function(result) {
-            this.movieId2 = result[0];
+            self.movieId2 = result[0];
 
-            return this.knex('reviews').insert({
+            return self.knex('reviews').insert({
                 stars: 10,
                 comment: 'comment',
-                movie_id: this.movieId,
-                user_id: this.userId
+                movie_id: self.movieId,
+                user_id: self.userId
             }).returning('id');
         }).then(function(result) {
-            this.reviewId = result[0];
+            self.reviewId = result[0];
 
-            return this.knex('reviews').insert({
+            return self.knex('reviews').insert({
                 stars: 5,
                 comment: 'comment',
-                movie_id: this.movieId2,
-                user_id: this.userId
+                movie_id: self.movieId2,
+                user_id: self.userId
             }).returning('id');
         }).then(function(result) {
-            this.reviewId2 = result[0];
+            self.reviewId2 = result[0];
         });
     });
 
     afterEach(function() {
+        const self = this;
         return this.knex('reviews').whereIn('id', [this.reviewId, this.reviewId2])
-            .del().bind(this).then(function() {
-                return this.knex('movies').whereIn('id', [this.movieId, this.movieId2]).del();
+            .del().then(function() {
+                return self.knex('movies').whereIn('id', [self.movieId, self.movieId2]).del();
             }).then(function() {
-                return this.knex('users').whereIn('id', [this.userId]).del();
+                return self.knex('users').whereIn('id', [self.userId]).del();
             });
     });
 

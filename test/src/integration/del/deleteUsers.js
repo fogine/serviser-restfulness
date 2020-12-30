@@ -1,6 +1,7 @@
 
 describe('DELETE /api/v1.0/users', function() {
     beforeEach(function() {
+        const self = this;
         return this.knex('users').insert({
             username: 'happie',
             password: 'secret',
@@ -8,30 +9,30 @@ describe('DELETE /api/v1.0/users', function() {
             email: 'email@email.com',
             created_at: this.knex.raw('now()'),
             updated_at: this.knex.raw('now()')
-        }).returning('id').bind(this).then(function(result) {
-            this.userId = result[0];
+        }).returning('id').then(function(result) {
+            self.userId = result[0];
 
-            return this.knex('users').insert({
+            return self.knex('users').insert({
                 username: 'happie2',
                 password: 'secret2',
                 subscribed: true,
                 email: 'email2@email.com',
-                created_at: this.knex.raw('now()'),
-                updated_at: this.knex.raw('now()')
+                created_at: self.knex.raw('now()'),
+                updated_at: self.knex.raw('now()')
             }).returning('id');
         }).then(function(result) {
-            this.userId2 = result[0];
+            self.userId2 = result[0];
 
-            return this.knex('users').insert({
+            return self.knex('users').insert({
                 username: 'happie3',
                 password: 'secret3',
                 subscribed: false,
                 email: 'email3@email.com',
-                created_at: this.knex.raw('now()'),
-                updated_at: this.knex.raw('now()')
+                created_at: self.knex.raw('now()'),
+                updated_at: self.knex.raw('now()')
             }).returning('id');
         }).then(function(result) {
-            this.userId3 = result[0];
+            self.userId3 = result[0];
         });
     });
 

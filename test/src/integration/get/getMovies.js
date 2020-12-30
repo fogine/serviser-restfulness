@@ -13,11 +13,11 @@ describe('GET /api/v1.0/movies', function() {
             });
         }
 
+        const self = this;
         return this.knex.batchInsert('movies', rows, 20)
             .returning('id')
-            .bind(this)
             .then(function(ids) {
-                this.movieIds = this.utils.expandResourceIds(ids, 20);
+                self.movieIds = self.utils.expandResourceIds(ids, 20);
             });
 
     });

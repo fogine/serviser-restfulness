@@ -1,27 +1,29 @@
 
 describe('GET /api/v1.0/movies/:column', function() {
     before(function() {
+        const self = this;
         return this.knex('countries').insert({
             name: 'United States',
             code_2: 'US',
-        }).returning('id').bind(this).then(function(result) {
-            this.countryId = result[0];
+        }).returning('id').then(function(result) {
+            self.countryId = result[0];
 
-            return this.knex('movies').insert({
+            return self.knex('movies').insert({
                 name: 'name',
                 description: 'description',
                 released_at: '2019-01-01',
-                country_id: this.countryId,
+                country_id: self.countryId,
                 rating: 10
             }).returning('id');
         }).then(function(result) {
-            this.movieId = result[0];
+            self.movieId = result[0];
         });
     });
 
     after(function() {
-        return this.knex('movies').whereIn('id', [this.movieId]).del().bind(this).then(function() {
-            return this.knex('countries').where({id: this.countryId}).del();
+        const self = this;
+        return this.knex('movies').whereIn('id', [this.movieId]).del().then(function() {
+            return self.knex('countries').where({id: self.countryId}).del();
         });
     });
 

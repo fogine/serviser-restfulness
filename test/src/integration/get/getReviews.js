@@ -1,5 +1,6 @@
 describe('GET /api/v1.0/reviews', function() {
     before(function() {
+        const self = this;
 
         return this.knex('users').insert({
             username: 'happie',
@@ -8,8 +9,8 @@ describe('GET /api/v1.0/reviews', function() {
             email: 'email@email.com',
             created_at: this.knex.raw('now()'),
             updated_at: this.knex.raw('now()')
-        }).returning('id').bind(this).then(function(result) {
-            this.userId = result[0];
+        }).returning('id').then(function(result) {
+            self.userId = result[0];
 
             const movieRows = [];
             for (let i = 0, len = 20; i < len; i++) {
@@ -21,23 +22,23 @@ describe('GET /api/v1.0/reviews', function() {
                 });
             }
 
-            return this.knex.batchInsert('movies', movieRows, 20).returning('id');
-        }).bind(this).then(function(ids) {
-            this.movieIds = this.utils.expandResourceIds(ids, 20);
+            return self.knex.batchInsert('movies', movieRows, 20).returning('id');
+        }).then(function(ids) {
+            self.movieIds = self.utils.expandResourceIds(ids, 20);
 
             const reviewRows = [];
             for (let i = 0, len = 20; i < len; i++) {
                 reviewRows.push({
                     comment: `comment${i+1}`,
-                    movie_id: this.movieIds[i],
-                    user_id: this.userId,
+                    movie_id: self.movieIds[i],
+                    user_id: self.userId,
                     stars: 8
                 });
             }
 
-            return this.knex.batchInsert('reviews', reviewRows, 20).returning('id');
-        }).bind(this).then(function(ids) {
-            this.reviewIds = this.utils.expandResourceIds(ids, 20);
+            return self.knex.batchInsert('reviews', reviewRows, 20).returning('id');
+        }).then(function(ids) {
+            self.reviewIds = self.utils.expandResourceIds(ids, 20);
         });
     });
 
@@ -53,7 +54,7 @@ describe('GET /api/v1.0/reviews', function() {
                 delQuery.where({id: ids[index]});
             }
 
-            return delQuery.del().reflect()
+            return self.Promise.resolve(delQuery.del()).reflect()
         });
     });
 
