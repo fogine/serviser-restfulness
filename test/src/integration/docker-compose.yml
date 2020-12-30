@@ -24,7 +24,7 @@ services:
     command:
       >
        /wait-for-it.sh postgres:5432 --
-       /wait-for-it.sh mysql:3306 -t 20 -- bash -c
+       /wait-for-it.sh mysql:3306 -t 30 -- bash -c
        'npm run migrate
        && npm test
        && npm run test:integration'
@@ -36,7 +36,7 @@ services:
       <<: *x-env
   mysql:
     image: "mysql:8"
-    entrypoint: ['/entrypoint.sh', '--default-authentication-plugin=mysql_native_password']
+    entrypoint: ['/entrypoint.sh', '--default-authentication-plugin=mysql_native_password', '--log-bin-trust-function-creators=TRUE']
     ports:
       - "3306"
     environment:
