@@ -64,6 +64,14 @@ describe('queryFilter', function() {
                     expectedSQL: 'select * from "user" where "user"."id" not in (1, 2, 3)'
                 },
                 {
+                    filter: { id: {not: {in: [1,2,null]}} },
+                    expectedSQL: 'select * from "user" where ("user"."id" is not null and "user"."id" not in (1, 2))'
+                },
+                {
+                    filter: { id: {in: [1,2,null]} },
+                    expectedSQL: 'select * from "user" where ("user"."id" is null or "user"."id" in (1, 2))'
+                },
+                {
                     filter: { username: {like: 'Happie%'} },
                     expectedSQL: `select * from "user" where "user"."username" like 'Happie%'`
                 },

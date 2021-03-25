@@ -1,4 +1,8 @@
-## 0.9.0
+## 0.8.2
+
+* [FIXED] - postgresql - support null value in `in` query _filter
+
+## 0.8.1
 
 * [FIXED] - adds support for knex@0.21.15
 
