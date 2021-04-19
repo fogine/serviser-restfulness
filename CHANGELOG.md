@@ -1,3 +1,11 @@
+## 0.8.4
+
+* [FIXED] - exception when trying to generate a link for non-existing get route while creating a new resource
+
+## 0.8.3
+
+* [FIXED] -  bugfix _embed query parameter - allow upper case characters
+
 ## 0.8.2
 
 * [FIXED] - postgresql - support null value in `in` query _filter
