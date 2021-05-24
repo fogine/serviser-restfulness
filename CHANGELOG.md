@@ -1,3 +1,7 @@
+## 0.8.5
+
+* [FIXED] - incorrect validation of numbers in `_filter` query param
+
 ## 0.8.4
 
 * [FIXED] - exception when trying to generate a link for non-existing get route while creating a new resource
