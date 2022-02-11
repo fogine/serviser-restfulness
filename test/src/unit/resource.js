@@ -487,7 +487,7 @@ describe('Resource', function() {
     });
 
     describe('getRequiredProperties', function() {
-        it('should return array of property names which dont have either dynamic or static default value defined', function() {
+        it('should return array of property names which dont have either dynamic or static default value defined and are not set as nullable', function() {
             let resource = new this.Resource({
                 singular: 'user',
                 plural: 'users',
@@ -498,6 +498,7 @@ describe('Resource', function() {
                     created_at: {type: 'string'},
                     activated: {type: 'boolean', default: true},
                     username: {type: 'string'},
+                    address: {type: 'string', nullable: true},
                     password: {type: 'string'}
                 }
             });

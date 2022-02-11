@@ -4,6 +4,7 @@
 * [ADDED] - query `_filter` - allow to filter by associated many to many (MxM) and one to many (1xM) resources
 * [FIXED] - updated lts-alpine nodejs docker image for tests
 * [FIXED] - query `_filter` - when when filtering via associated table column value - inner join should not be used because it doesnt allow to select records with no associated resource (where is null condition)
+* [FIXED] - if resource property has truthy `nullable` flag, it should not be considered required
 
 ## 0.8.5
 
