@@ -84,11 +84,11 @@ function createEndpoints() {
     users.get('/'); //get users
     users.get('/:{key}(\\d+)'); //get user
     users.get('/:username'); //get user by username
-    users.get('/:{key}(\\d+)/@movies/').reducesDatasetBy(['id', 'review.stars']); //get user movies
+    users.get('/:{key}(\\d+)/@movies/').reducesDatasetBy(['id', 'name', 'review.id', 'review.stars']); //get user movies
     users.get('/:username/@movies/'); //get user movies
     users.get('/:{key}(\\d+)/@movies/:{key}(\\d+)'); //get user movie
     users.get('/:username/@movies/:name'); //get user movie
-    users.get('/:{key}(\\d+)/@reviews/'); //get user reviews
+    users.get('/:{key}(\\d+)/@reviews/').reducesDatasetBy(['id', 'movie.id', 'movie.name']); //get user reviews
     users.get('/:username/@reviews/'); //get user reviews
     users.get('/:{key}(\\d+)/@reviews/:{key}'); //get user review
     users.get('/:username/@reviews/:{key}'); //get user review

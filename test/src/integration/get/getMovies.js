@@ -20,7 +20,7 @@ describe('GET /api/v1.0/movies', function() {
                 self.movieIds = self.utils.expandResourceIds(ids, 20);
 
                 const userRows = [];
-                for (let i = 0, len = 20; i < len; i++) {
+                for (let i = 0, len = 10; i < len; i++) {
                     userRows.push({
                         username: `happie${i}`,
                         password: 'secret',
@@ -31,21 +31,21 @@ describe('GET /api/v1.0/movies', function() {
                     });
                 }
 
-                return self.knex.batchInsert('users', userRows, 20).returning('id');
+                return self.knex.batchInsert('users', userRows, 10).returning('id');
             }).then(function(ids) {
-                self.userIds = self.utils.expandResourceIds(ids, 20);
+                self.userIds = self.utils.expandResourceIds(ids, 10);
 
                 const moviesUsersRows = [];
-                for (let i = 0, len = 20; i < len; i++) {
+                for (let i = 0, len = 10; i < len; i++) {
                     moviesUsersRows.push({
                         movie_id: self.movieIds[i],
                         user_id: self.userIds[i]
                     });
                 }
 
-                return self.knex.batchInsert('movies_users', moviesUsersRows, 20).returning('id');
+                return self.knex.batchInsert('movies_users', moviesUsersRows, 10).returning('id');
             }).then(function(ids) {
-                self.moviesUsersIds = self.utils.expandResourceIds(ids, 20);
+                self.moviesUsersIds = self.utils.expandResourceIds(ids, 10);
             });
 
     });
@@ -109,13 +109,23 @@ describe('GET /api/v1.0/movies', function() {
             });
         });
 
-        it.only('should allow to _filter by associated resource of type many to many (MxM)', function() {
+        it('should allow to _filter by associated resource of type many to many (MxM)', function() {
             const expect = this.expect;
 
             return this.sdk.getMovies({query: {
-                _filter: {'user.username': {in: ['happie10', 'happie11', 'happie12']}}
+                _filter: {'user.username': {in: ['happie7', 'happie8', 'happie9']}}
             }}).then(function(response) {
                 expect(response.data.length).to.be.equal(3);
+            });
+        });
+
+        it('should allow to _filter for movies which do NOT have any associated users (association MxM)', function() {
+            const expect = this.expect;
+
+            return this.sdk.getMovies({query: {
+                _filter: {'user.username': {eq: null}}
+            }}).then(function(response) {
+                expect(response.data.length).to.be.equal(10);
             });
         });
 

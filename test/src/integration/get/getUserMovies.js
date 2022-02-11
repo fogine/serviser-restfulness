@@ -35,7 +35,7 @@ describe('GET /api/v1.0/users/:column/movies', function() {
             self.movieIds = self.utils.expandResourceIds(ids, 20);
 
             const reviewsRows = [];
-            for (let i = 0, len = 20; i < len; i++) {
+            for (let i = 0, len = 15; i < len; i++) {
                 reviewsRows.push({
                     movie_id: self.movieIds[i],
                     user_id: self.userId,
@@ -43,9 +43,9 @@ describe('GET /api/v1.0/users/:column/movies', function() {
                 });
             }
 
-            return self.knex.batchInsert('reviews', reviewsRows, 20).returning('id');
+            return self.knex.batchInsert('reviews', reviewsRows, 15).returning('id');
         }).then(function(ids) {
-            self.reviewIds = self.utils.expandResourceIds(ids, 20);
+            self.reviewIds = self.utils.expandResourceIds(ids, 15);
 
             const moviesUsersRows = [];
             for (let i = 0, len = 20; i < len; i++) {
@@ -200,9 +200,20 @@ describe('GET /api/v1.0/users/:column/movies', function() {
             const userId = this.userId;
 
             return this.sdk.getUsersMovies(userId, {query: {
-                _filter: {'review.stars': {gte: 10}}
+                _filter: {'review.stars': {gte: 5}}
             }}).then(function(response) {
                 expect(response.data.length).to.be.equal(10);
+            });
+        });
+
+        it('should allow to _filter for movies which do NOT have any associated reviews (association 1xM)', function() {
+            const expect = this.expect;
+            const userId = this.userId;
+
+            return this.sdk.getUsersMovies(userId, {query: {
+                _filter: {'review.id': {eq: null}}
+            }}).then(function(response) {
+                expect(response.data.length).to.be.equal(5);
             });
         });
 

@@ -32,7 +32,8 @@ describe('GET /api/v1.0/users/:column/reviews', function() {
                 reviewRows.push({
                     stars: 10,
                     comment: 'comment',
-                    movie_id: self.movieIds[i],
+                    //2 reviews without associated movie for a test case
+                    movie_id: i < 18 ? self.movieIds[i] : null,
                     user_id: self.userId
                 });
             }
@@ -93,7 +94,9 @@ describe('GET /api/v1.0/users/:column/reviews', function() {
                 expect(review.id).to.equal(reviewIds[index]);
                 expect(review.comment).to.equal('comment');
                 expect(review.stars).to.equal(10);
-                expect(review.movie_id).to.equal(movieIds[index]);
+                if (review.id < 18) { //2 reviews are saved without movie_id
+                    expect(review.movie_id).to.equal(movieIds[index]);
+                }
                 expect(review.user_id).to.equal(userId);
             });
         });
@@ -118,7 +121,9 @@ describe('GET /api/v1.0/users/:column/reviews', function() {
                 expect(review.id).to.equal(reviewIds[index]);
                 expect(review.comment).to.equal('comment');
                 expect(review.stars).to.equal(10);
-                expect(review.movie_id).to.equal(movieIds[index]);
+                if (review.id < 18) { //2 reviews are saved without movie_id
+                    expect(review.movie_id).to.equal(movieIds[index]);
+                }
                 expect(review.user_id).to.equal(userId);
             });
         });
@@ -171,18 +176,20 @@ describe('GET /api/v1.0/users/:column/reviews', function() {
                 expect(review.id).to.equal(reviewIds[index]);
                 expect(review.comment).to.equal('comment');
                 expect(review.stars).to.equal(10);
-                expect(review.movie_id).to.equal(movieIds[index]);
+                if (review.id < 18) { //2 reviews are saved without movie_id
+                    expect(review.movie_id).to.equal(movieIds[index]);
+                    expect(review.movie.released_at).to.be.a('string');
+                    delete review.movie.released_at;
+
+                    expect(review.movie).to.eql({
+                        id: movieIds[index],
+                        name: `Title${index+1}`,
+                        country_id: 0,
+                        rating: 10
+                    });
+                }
                 expect(review.user_id).to.equal(userId);
 
-                expect(review.movie.released_at).to.be.a('string');
-                delete review.movie.released_at;
-
-                expect(review.movie).to.eql({
-                    id: movieIds[index],
-                    name: `Title${index+1}`,
-                    country_id: 0,
-                    rating: 10
-                });
             });
         });
     });
@@ -208,13 +215,15 @@ describe('GET /api/v1.0/users/:column/reviews', function() {
                 expect(review.id).to.equal(reviewIds[index]);
                 expect(review.comment).to.equal('comment');
                 expect(review.stars).to.equal(10);
-                expect(review.movie_id).to.equal(movieIds[index]);
+                if (review.id < 18) { //2 reviews are saved without movie_id
+                    expect(review.movie_id).to.equal(movieIds[index]);
+                    expect(review.movie).to.eql({
+                        name: `Title${index+1}`,
+                        rating: 10
+                    });
+                }
                 expect(review.user_id).to.equal(userId);
 
-                expect(review.movie).to.eql({
-                    name: `Title${index+1}`,
-                    rating: 10
-                });
             });
         });
     });
@@ -238,12 +247,23 @@ describe('GET /api/v1.0/users/:column/reviews', function() {
         it('should allow to _filter by associated resource of type one to one (1x1)', function() {
             const expect = this.expect;
             const userId = this.userId;
-            const reviewIds = this.reviewIds;
 
             return this.sdk.getUsersReviews(userId, {query: {
-                _filter: {'movie.name': {like: 'Title1%'}}
+                _filter: {'movie.name': {like: 'Title1%'}},
+                _embed: 'movie.name,movie.id'
             }}).then(function(response) {
-                expect(response.data.length).to.be.equal(11);
+                expect(response.data.length).to.be.equal(10);
+            });
+        });
+
+        it('should allow to _filter for reviews which do NOT have any associated movies (association 1x1) - database setup should contain such cases just to test the functionality', function() {
+            const expect = this.expect;
+            const userId = this.userId;
+
+            return this.sdk.getUsersReviews(userId, {query: {
+                _filter: {'movie.id': {eq: null}}
+            }}).then(function(response) {
+                expect(response.data.length).to.be.equal(2);
             });
         });
 
