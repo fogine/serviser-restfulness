@@ -35,7 +35,7 @@
         "test:integration": "mocha --ui bdd --exit --colors --globals __core-js_shared__ --check-leaks -t 100000 --reporter spec 'test/src/integration/index.js'"
     },
     "dependencies": {
-        "ajv": "~6.9.1",
+        "ajv": "~6.12.3",
         "ajv-keywords": "^3.4.0",
         "lodash": "~4.17.4",
         "qs": "~6.5.1"
