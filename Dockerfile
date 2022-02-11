@@ -1,4 +1,4 @@
-FROM lucidservices/node:current-alpine
+FROM lucidservices/node:lts-alpine
 
 WORKDIR /app
 
@@ -13,7 +13,7 @@ ARG NODE_ENV=development
 # This will NOT increase final docker image size as additional dependencies
 # are removed after npm install
 RUN apk --no-cache add --virtual native-deps \
-  g++ gcc libgcc libstdc++ linux-headers make python findutils postgresql-dev && \
+  g++ gcc libgcc libstdc++ linux-headers make python3 findutils postgresql-dev && \
   apk add --no-cache perl-dbd-pg perl-dbd-mysql postgresql-client mysql-client && \
   NODE_ENV=$NODE_ENV && \
   yarn install --quiet --no-optional && \
