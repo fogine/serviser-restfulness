@@ -1,6 +1,7 @@
 ## FUTURE
 
 * [ADDED] - query `_filter` - allow to use gt,gte,lt,lte keywords for strings
+* [ADDED] - query `_filter` - allow to filter by associated many to many (MxM) and one to many (1xM) resources
 * [FIXED] - updated lts-alpine nodejs docker image for tests
 
 ## 0.8.5

@@ -84,7 +84,7 @@ function createEndpoints() {
     users.get('/'); //get users
     users.get('/:{key}(\\d+)'); //get user
     users.get('/:username'); //get user by username
-    users.get('/:{key}(\\d+)/@movies/'); //get user movies
+    users.get('/:{key}(\\d+)/@movies/').reducesDatasetBy(['id', 'review.stars']); //get user movies
     users.get('/:username/@movies/'); //get user movies
     users.get('/:{key}(\\d+)/@movies/:{key}(\\d+)'); //get user movie
     users.get('/:username/@movies/:name'); //get user movie
@@ -117,7 +117,7 @@ function createEndpoints() {
     users.del('/:{key}(\\d+)/@reviews'); //delete all user reviews
     users.del('/:username/@reviews'); //delete all user reviews
 
-    movies.get('/').reducesDatasetBy(['id', 'released_at']);//get movies
+    movies.get('/').reducesDatasetBy(['id', 'released_at', 'user.username']);//get movies
     movies.get('/:{key}/@reviews');//get movie reviews
     movies.get('/:{key}(\\d+)/@countries/:{key}(\\d+)');//get movie country
     movies.get('/:{key}(\\d+)/@countries/:code_2');//get movie country

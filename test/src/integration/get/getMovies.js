@@ -18,12 +18,42 @@ describe('GET /api/v1.0/movies', function() {
             .returning('id')
             .then(function(ids) {
                 self.movieIds = self.utils.expandResourceIds(ids, 20);
+
+                const userRows = [];
+                for (let i = 0, len = 20; i < len; i++) {
+                    userRows.push({
+                        username: `happie${i}`,
+                        password: 'secret',
+                        subscribed: false,
+                        email: `email${i}@email.com`,
+                        created_at: self.knex.raw('now()'),
+                        updated_at: self.knex.raw('now()')
+                    });
+                }
+
+                return self.knex.batchInsert('users', userRows, 20).returning('id');
+            }).then(function(ids) {
+                self.userIds = self.utils.expandResourceIds(ids, 20);
+
+                const moviesUsersRows = [];
+                for (let i = 0, len = 20; i < len; i++) {
+                    moviesUsersRows.push({
+                        movie_id: self.movieIds[i],
+                        user_id: self.userIds[i]
+                    });
+                }
+
+                return self.knex.batchInsert('movies_users', moviesUsersRows, 20).returning('id');
+            }).then(function(ids) {
+                self.moviesUsersIds = self.utils.expandResourceIds(ids, 20);
             });
 
     });
 
-    after(function() {
-        return this.knex('movies').whereIn('id', this.movieIds).del();
+    after(async function() {
+        await this.knex('movies_users').whereIn('id', this.moviesUsersIds).del();
+        await this.knex('movies').whereIn('id', this.movieIds).del();
+        await this.knex('users').whereIn('id', this.userIds).del();
     });
 
     it('should return filtered collection by id column', function() {
@@ -76,6 +106,16 @@ describe('GET /api/v1.0/movies', function() {
                 _filter: {released_at: {gt:'2022-02-11'}}
             }}).then(function(response) {
                 expect(response.data.length).to.be.equal(20);
+            });
+        });
+
+        it.only('should allow to _filter by associated resource of type many to many (MxM)', function() {
+            const expect = this.expect;
+
+            return this.sdk.getMovies({query: {
+                _filter: {'user.username': {in: ['happie10', 'happie11', 'happie12']}}
+            }}).then(function(response) {
+                expect(response.data.length).to.be.equal(3);
             });
         });
 

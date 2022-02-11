@@ -34,6 +34,19 @@ describe('GET /api/v1.0/users/:column/movies', function() {
         }).then(function(ids) {
             self.movieIds = self.utils.expandResourceIds(ids, 20);
 
+            const reviewsRows = [];
+            for (let i = 0, len = 20; i < len; i++) {
+                reviewsRows.push({
+                    movie_id: self.movieIds[i],
+                    user_id: self.userId,
+                    stars: i
+                });
+            }
+
+            return self.knex.batchInsert('reviews', reviewsRows, 20).returning('id');
+        }).then(function(ids) {
+            self.reviewIds = self.utils.expandResourceIds(ids, 20);
+
             const moviesUsersRows = [];
             for (let i = 0, len = 20; i < len; i++) {
                 moviesUsersRows.push({
@@ -71,12 +84,13 @@ describe('GET /api/v1.0/users/:column/movies', function() {
         const self = this;
         let ids = [
             this.moviesUsersIds.concat([this.moviesUsersId]),
+            this.reviewIds,
             [this.userId, this.deletedUserId],
             this.movieIds,
             this.countryId
         ];
 
-        return this.Promise.each(['movies_users', 'users', 'movies', 'countries'], function(table, index) {
+        return this.Promise.each(['movies_users', 'reviews', 'users', 'movies', 'countries'], function(table, index) {
             const delQuery = self.knex(table);
             if (ids[index] instanceof Array) {
                 delQuery.whereIn('id', ids[index]);
@@ -180,6 +194,18 @@ describe('GET /api/v1.0/users/:column/movies', function() {
     });
 
     describe('_filter', function() {
+
+        it('should allow to _filter by associated resource of type one to many (1xM)', function() {
+            const expect = this.expect;
+            const userId = this.userId;
+
+            return this.sdk.getUsersMovies(userId, {query: {
+                _filter: {'review.stars': {gte: 10}}
+            }}).then(function(response) {
+                expect(response.data.length).to.be.equal(10);
+            });
+        });
+
         it('should return multiple movie records based on provided query filter {id: {in: [<id1>,<id2>]}}', function() {
             const expect = this.expect;
             const userId = this.userId;
