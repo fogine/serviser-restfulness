@@ -117,7 +117,7 @@ function createEndpoints() {
     users.del('/:{key}(\\d+)/@reviews'); //delete all user reviews
     users.del('/:username/@reviews'); //delete all user reviews
 
-    movies.get('/').reducesDatasetBy(['id']);//get movies
+    movies.get('/').reducesDatasetBy(['id', 'released_at']);//get movies
     movies.get('/:{key}/@reviews');//get movie reviews
     movies.get('/:{key}(\\d+)/@countries/:{key}(\\d+)');//get movie country
     movies.get('/:{key}(\\d+)/@countries/:code_2');//get movie country

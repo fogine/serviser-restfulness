@@ -80,6 +80,10 @@ describe('queryFilter', function() {
                     expectedSQL: `select * from "user" where "user"."username" ilike '%happie%'`
                 },
                 {
+                    filter: { createdAt: {gt: '2022-02-11'} },
+                    expectedSQL: `select * from "user" where "user"."createdAt" > '2022-02-11'`
+                },
+                {
                     filter: { id: {between: [1,10]} },
                     expectedSQL: `select * from "user" where "user"."id" between 1 and 10`
                 },

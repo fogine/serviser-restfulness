@@ -67,6 +67,18 @@ describe('GET /api/v1.0/movies', function() {
             });
         });
 
+        it('should allow to filter by released_at timestamp', function() {
+            const self = this;
+            const expect = this.expect;
+            const movieIds = this.movieIds;
+
+            return this.sdk.getMovies({query: {
+                _filter: {released_at: {gt:'2022-02-11'}}
+            }}).then(function(response) {
+                expect(response.data.length).to.be.equal(20);
+            });
+        });
+
         it('should return 400 json response with validation error when filter is applied to an unallowed country_id column', function() {
             const self = this;
             const expect = this.expect;

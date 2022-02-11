@@ -1,3 +1,8 @@
+## FUTURE
+
+* [ADDED] - query `_filter` - allow to use gt,gte,lt,lte keywords for strings
+* [FIXED] - updated lts-alpine nodejs docker image for tests
+
 ## 0.8.5
 
 * [FIXED] - incorrect validation of numbers in `_filter` query param
